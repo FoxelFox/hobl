@@ -1,0 +1,7 @@
+// was only needed for IDE type infos for dom
+// maybe deno support will better in future
+{
+  "compilerOptions": {
+    "lib": ["dom"]
+  }
+}
