@@ -1,31 +1,44 @@
 import { createChart } from 'lightweight-charts';
+import {Api} from "./api.ts";
 
 export class Chart {
 
-    constructor() {
-        const chart = createChart(document.getElementById('chart')!);
+    constructor(private api: Api) {
+        const chart = createChart(document.getElementById('chart')!, {
+            autoSize: true,
+            layout: {
+                background: {color: "#222"},
+                textColor: '#DDD',
+            },
+            grid: {
+                vertLines: { color: '#444' },
+                horzLines: { color: '#444' },
+            },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false,
 
-        const areaSeries = chart.addAreaSeries();
-        areaSeries.setData([
-            // ... other data items
-            { time: '2018-12-31', value: 22.67 },
-        ]);
+            },
+        });
+
+        //const areaSeries = chart.addAreaSeries({});
+        // areaSeries.setData([
+        //     // ... other data items
+        //     { time: '2018-12-31', value: 22.67 },
+        // ]);
 
         const candlestickSeries = chart.addCandlestickSeries();
-        candlestickSeries.setData([
-            // ... other data items
-            { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
-        ]);
+        // candlestickSeries.setData([
+        //     // ... other data items
+        //     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
+        // ]);
+        chart.timeScale().fitContent();
 
-        // sometime later
-
-        // update the most recent bar
-        areaSeries.update({ time: '2018-12-31', value: 25 });
-        candlestickSeries.update({ time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 112 });
-
-        // creating the new bar
-        areaSeries.update({ time: '2019-01-01', value: 20 });
-        candlestickSeries.update({ time: '2019-01-01', open: 112, high: 112, low: 100, close: 101 });
+        this.api.subscribe((data) => {
+            for(const entry of data) {
+                candlestickSeries.update(entry);
+          //      areaSeries.update(entry);
+            }
+        });
     }
-
 }

@@ -5,7 +5,7 @@
   "tasks": {
     "build": "deno run --allow-all bundle.ts",
     "watch": "deno run --allow-all bundle.ts watch",
-    "serve": "deno run -A https://deno.land/std@0.172.0/http/file_server.ts --port 3000"
+    "serve": "deno run -A https://deno.land/std@0.172.0/http/file_server.ts --port 4200"
   },
   "imports": {
     "lightweight-charts": "npm:lightweight-charts"

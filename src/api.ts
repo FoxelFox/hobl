@@ -1,4 +1,18 @@
+import {Time} from "npm:lightweight-charts@4.2.1";
+
+interface PriceData {
+    time: Time
+    open: number
+    high: number
+    low: number
+    close: number
+    value: number // volume
+}
+
 export class Api {
+
+    listner: ((update: PriceData[]) => void)[] = [];
+
     constructor() {
 
     }
@@ -21,6 +35,27 @@ export class Api {
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
+            const priceDatas: PriceData[] = [];
+
+            // {"T":"b","S":"PLTR","o":61.9,"h":61.92,"l":61.88,"c":61.88,"v":821,"t":"2024-11-19T19:41:00Z","n":10,"vw":61.901923}
+            for (const entry of data) {
+                if (entry.T === "b") { // new bar
+                    priceDatas.push({
+                        time: (new Date(entry.t)).getTime() / 1000 as Time,
+                        open: entry.o,
+                        high: entry.h,
+                        low: entry.l,
+                        close: entry.c,
+                        value: entry.v
+                    });
+                }
+            }
+
+            for (const l of this.listner) {
+                l(priceDatas);
+            }
+
             console.log(JSON.stringify(data));
         };
 
@@ -31,5 +66,9 @@ export class Api {
         ws.onclose = () => {
             console.log('connection closed');
         };
+    }
+
+    subscribe(listener: ((update: PriceData[]) => void)) {
+        this.listner.push(listener);
     }
 }

@@ -2,6 +2,6 @@
 // maybe deno support will better in future
 {
   "compilerOptions": {
-    "lib": ["dom"]
+    "lib": ["dom"],
   }
 }
