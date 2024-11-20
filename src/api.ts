@@ -32,7 +32,7 @@ export class Api {
 
             ws.send(JSON.stringify({
                 action: "subscribe",
-                bars:["*"],
+                bars:["NVDA", "PLTR", "AAPL", "GOOG", "AMZN", "META", "TSLA", "TSM", "AMD"],
             }));
         };
 

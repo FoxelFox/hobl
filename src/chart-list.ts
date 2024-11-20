@@ -10,7 +10,7 @@ export class ChartList {
             for(const symbol in data) {
                 if (!this.charts[symbol]) {
                     document.getElementById("charts")!.insertAdjacentHTML("beforeend",
-                        `<div id="${symbol}" style="width: calc(100vw /3); height: 100px"></div>`
+                        `<div id="${symbol}" style="height: 384px"></div>`
                     );
                     this.charts[symbol] = new Chart(symbol);
                 }

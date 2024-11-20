@@ -6,8 +6,19 @@ export class Chart {
     candlestickSeries
     chart
 
+    min = Number.MAX_VALUE
+    max = Number.MIN_VALUE
+
     constructor(private id: string) {
         this.chart = createChart(document.getElementById(id)!, {
+            watermark: {
+                visible: true,
+                text: id,
+                fontSize: 24,
+                horzAlign: 'center',
+                vertAlign: 'center',
+                color: 'rgba(255, 255, 255, 0.5)',
+            },
             autoSize: true,
             layout: {
                 background: {color: "#222"},
@@ -39,10 +50,12 @@ export class Chart {
 
     update(data: Price[]) {
         for(const entry of data) {
+            this.min = Math.min(this.min, entry.low);
+            this.max = Math.min(this.max, entry.high);
             this.candlestickSeries.update(entry);
 
             // is this needed?
-            this.chart.timeScale().fitContent();
+
         }
     }
 }
