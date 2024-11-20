@@ -1,6 +1,6 @@
 import {Time} from "npm:lightweight-charts@4.2.1";
 
-interface PriceData {
+export interface Price {
     time: Time
     open: number
     high: number
@@ -9,9 +9,14 @@ interface PriceData {
     value: number // volume
 }
 
+export interface Data {
+    [key: string]: Price[]
+}
+
 export class Api {
 
-    listner: ((update: PriceData[]) => void)[] = [];
+    listner: ((update: Data) => void)[] = [];
+    db: Data = {};
 
     constructor() {
 
@@ -25,23 +30,25 @@ export class Api {
                 {"action": "auth", "key": auth.key, "secret": auth.secret},
             ));
 
-            ws.send(JSON.stringify(
-
-                {
-                    action: "subscribe",
-                    bars:["PLTR"],
-                }));
+            ws.send(JSON.stringify({
+                action: "subscribe",
+                bars:["*"],
+            }));
         };
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
-            const priceDatas: PriceData[] = [];
+            const priceDatas: {[key:string]: Price[]} = {};
 
             // {"T":"b","S":"PLTR","o":61.9,"h":61.92,"l":61.88,"c":61.88,"v":821,"t":"2024-11-19T19:41:00Z","n":10,"vw":61.901923}
             for (const entry of data) {
                 if (entry.T === "b") { // new bar
-                    priceDatas.push({
+                    if (!priceDatas[entry.S]) {
+                        priceDatas[entry.S] = [];
+                    }
+
+                    priceDatas[entry.S].push({
                         time: (new Date(entry.t)).getTime() / 1000 as Time,
                         open: entry.o,
                         high: entry.h,
@@ -68,7 +75,7 @@ export class Api {
         };
     }
 
-    subscribe(listener: ((update: PriceData[]) => void)) {
+    subscribe(listener: ((update: Data) => void)) {
         this.listner.push(listener);
     }
 }

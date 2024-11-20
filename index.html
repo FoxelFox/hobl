@@ -12,9 +12,14 @@
     body {
         margin: 0;
     }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));;
+    }
 </style>
 <body>
-    <div id="chart" style="width: 100vw; height: 100vh"></div>
+    <div class="grid" id="charts"></div>
 </body>
 <script type="module" src="dist/bundle.js"></script>
 </html>

@@ -1,10 +1,13 @@
 import { createChart } from 'lightweight-charts';
-import {Api} from "./api.ts";
+import {Price} from "./api.ts";
 
 export class Chart {
 
-    constructor(private api: Api) {
-        const chart = createChart(document.getElementById('chart')!, {
+    candlestickSeries
+    chart
+
+    constructor(private id: string) {
+        this.chart = createChart(document.getElementById(id)!, {
             autoSize: true,
             layout: {
                 background: {color: "#222"},
@@ -17,7 +20,6 @@ export class Chart {
             timeScale: {
                 timeVisible: true,
                 secondsVisible: false,
-
             },
         });
 
@@ -27,18 +29,20 @@ export class Chart {
         //     { time: '2018-12-31', value: 22.67 },
         // ]);
 
-        const candlestickSeries = chart.addCandlestickSeries();
+        this.candlestickSeries = this.chart.addCandlestickSeries();
         // candlestickSeries.setData([
         //     // ... other data items
         //     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
         // ]);
-        chart.timeScale().fitContent();
 
-        this.api.subscribe((data) => {
-            for(const entry of data) {
-                candlestickSeries.update(entry);
-          //      areaSeries.update(entry);
-            }
-        });
+    }
+
+    update(data: Price[]) {
+        for(const entry of data) {
+            this.candlestickSeries.update(entry);
+
+            // is this needed?
+            this.chart.timeScale().fitContent();
+        }
     }
 }
