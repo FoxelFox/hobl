@@ -1,8 +1,9 @@
 import { createChart } from 'lightweight-charts';
-import {Price} from "./api.ts";
+import {BasicPrice, Price} from "./api.ts";
 
 export class Chart {
 
+    areaSeries
     candlestickSeries
     chart
 
@@ -34,11 +35,7 @@ export class Chart {
             },
         });
 
-        //const areaSeries = chart.addAreaSeries({});
-        // areaSeries.setData([
-        //     // ... other data items
-        //     { time: '2018-12-31', value: 22.67 },
-        // ]);
+        this.areaSeries = this.chart.addAreaSeries();
 
         this.candlestickSeries = this.chart.addCandlestickSeries();
         // candlestickSeries.setData([
@@ -57,5 +54,9 @@ export class Chart {
             // is this needed?
 
         }
+    }
+
+    drawPrediction(data: BasicPrice[]) {
+        this.areaSeries.setData(data);
     }
 }

@@ -141,6 +141,7 @@
   },
   "workspace": {
     "dependencies": [
+      "npm:@tensorflow/tfjs@*",
       "npm:lightweight-charts@*"
     ]
   }

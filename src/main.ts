@@ -1,8 +1,10 @@
-import {Api} from "./api.ts";
+import {Api, Price} from "./api.ts";
 import {ChartList} from "./chart-list.ts";
 
 const api = new Api();
-new ChartList(api);
+const charts = new ChartList(api);
 
-await api.login();
+//await api.login();
+api.fake();
+
 

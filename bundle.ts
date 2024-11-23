@@ -9,7 +9,8 @@ const result = await esbuild.context({
     outfile: "./dist/bundle.js",
     format: "esm",
     bundle: true,
-    logLevel: "info"
+    logLevel: "info",
+    sourcemap: true,
 });
 
 if (watch) {
