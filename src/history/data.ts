@@ -1,5 +1,5 @@
-import { Price } from "../api.ts";
-import {Time} from "npm:lightweight-charts@4.2.1";
+import { Price } from "../api";
+import { Time } from "lightweight-charts";
 
 export async function load(symbol: string) {
     const res = await fetch(`data/${symbol}.csv`);

@@ -1,4 +1,4 @@
-import {Time} from "npm:lightweight-charts@4.2.1";
+import {Time} from "lightweight-charts";
 
 export interface BasicPrice {
     time: Time

@@ -1,5 +1,5 @@
-import {Api, Price} from "./api.ts";
-import {ChartList} from "./chart-list.ts";
+import {Api, Price} from "./api";
+import {ChartList} from "./chart-list";
 
 const api = new Api();
 const charts = new ChartList(api);

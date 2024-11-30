@@ -1,5 +1,5 @@
 import { createChart } from 'lightweight-charts';
-import {BasicPrice, Price} from "./api.ts";
+import {BasicPrice, Price} from "./api";
 
 export class Chart {
 

@@ -1,6 +1,6 @@
 import * as tf  from "@tensorflow/tfjs"
-import {load, averagePrices} from "./history/data.ts";
-import {Price} from "./api.ts";
+import {load, averagePrices} from "./history/data";
+import {Price} from "./api";
 import { Time } from "lightweight-charts";
 
 export class Model {

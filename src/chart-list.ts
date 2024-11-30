@@ -1,7 +1,7 @@
-import {Api, Data, Price} from "./api.ts";
-import {Chart} from "./chart.ts";
-import {Model} from "./model.ts";
-import {LstmModel} from "./lstm-model.ts";
+import {Api, Data, Price} from "./api";
+import {Chart} from "./chart";
+import {Model} from "./model";
+import {LstmModel} from "./lstm-model";
 
 export class ChartList {
 

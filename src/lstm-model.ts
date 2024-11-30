@@ -1,6 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
-import { load, averagePrices } from "./history/data.ts";
-import {Time} from "npm:lightweight-charts@4.2.1";
+import { load, averagePrices } from "./history/data";
+import {Time} from "lightweight-charts";
 
 export class LstmModel {
     model;
