@@ -12,6 +12,7 @@
     "build-web": "bun build src/main.ts --outdir=dist"
   },
   "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.1.2",
     "@tensorflow/tfjs": "^4.22.0",
     "esbuild": "^0.24.0",
     "lightweight-charts": "4.2.1"
