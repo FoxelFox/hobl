@@ -18,13 +18,29 @@ export class AlpacaApi {
     }
 
     async getBars(symbol:string) {
-        const data = await this.alpaca.getCryptoBars(
-            ["BTC/USD"],
+
+        await this.getSymbols();
+
+        const data = await this.alpaca.getMultiBarsV2(
+            ["NVDA"],
             {
                 start: "2022-09-01",
                 end: "2022-09-07",
                 timeframe: this.alpaca.newTimeframe(1, this.alpaca.timeframeUnit.DAY)
             });
-        console.log(data);
+    }
+
+    async getSymbols(): Promise<Asset[]> {
+
+        const res = await (await fetch(
+            `https://paper-api.alpaca.markets/v2/assets`, {
+                headers: new Headers({
+                    "APCA-API-KEY-ID": this.auth.key,
+                    "APCA-API-SECRET-KEY": this.auth.secret,
+                    "accept": "application/json"
+                })
+            })).json();
+
+        return res.filter((item) => item.exchange === "NASDAQ");
     }
 }
