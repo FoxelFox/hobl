@@ -15,3 +15,14 @@ interface Asset {
     fractionable: boolean
     attributes: string[]
 }
+
+interface RawPriceAction {
+    c: 8.687,
+    h: 9.149,
+    l: 8.641,
+    n: 241419,
+    o: 9.124,
+    t: "2020-05-26T04:00:00Z",
+    v: 817377440,
+    vw: 8.817,
+}

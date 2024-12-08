@@ -1,16 +1,45 @@
-import {AlpacaApi} from "./alpacaApi";
+import {Runner} from "./runner";
 
 
-async function main() {
-    const api = new AlpacaApi();
-    await api.init();
-    await api.getBars(null)
+class Backend {
+
+    runner = new Runner();
+    router = {
+        'api/result': this.result
+    }
+
+    async main() {
+        await this.runner.init();
+        this.runner.run();
 
 
+
+
+    }
+
+    result() {
+        return Response.json({
+            macd: this.runner.strategy.macd,
+            signal: this.runner.strategy.signal
+        });
+    }
+}
+
+
+const backed = new Backend();
+
+backed.main().then(() => {
     Bun.serve({
         async fetch(req) {
 
             let path = new URL(req.url).pathname;
+
+            let p = path.split('/');
+            if (p[0] === "api") {
+                return backed.router[path]();
+            }
+
+
             if (path === "/") {
                 path = "index.html";
             } else {
@@ -26,6 +55,5 @@ async function main() {
 
         },
     });
-}
+});
 
-main().then(() => console.log("Done"));

@@ -1,5 +1,3 @@
-import Alpaca from "@alpacahq/alpaca-trade-api";
-
 export class AlpacaApi {
 
     auth: {
@@ -7,27 +5,35 @@ export class AlpacaApi {
         secret: string
     }
 
-    alpaca: Alpaca
+
 
     async init() {
         this.auth = await Bun.file("auth.json").json();
-        this.alpaca = new Alpaca({
-            keyId: this.auth.key,
-            secretKey: this.auth.secret,
-        });
+
     }
 
-    async getBars(symbol:string) {
+    async getPriceAction(symbol:string): Promise<RawPriceAction[]> {
 
-        await this.getSymbols();
+        const url = [
+            `https://data.alpaca.markets/v2/stocks/bars?symbols=${symbol}`,
+            `timeframe=1D`,
+            `start=2020-01-03`,
+            `limit=10000`,
+            `adjustment=all`,
+            `feed=sip`,
+            `sort=asc`
+        ].join("&");
 
-        const data = await this.alpaca.getMultiBarsV2(
-            ["NVDA"],
-            {
-                start: "2022-09-01",
-                end: "2022-09-07",
-                timeframe: this.alpaca.newTimeframe(1, this.alpaca.timeframeUnit.DAY)
-            });
+        const res = await (await fetch(
+            url, {
+                headers: new Headers({
+                    "APCA-API-KEY-ID": this.auth.key,
+                    "APCA-API-SECRET-KEY": this.auth.secret,
+                    "accept": "application/json"
+                })
+            })).json();
+
+        return res.bars[symbol]
     }
 
     async getSymbols(): Promise<Asset[]> {
@@ -41,6 +47,6 @@ export class AlpacaApi {
                 })
             })).json();
 
-        return res.filter((item) => item.exchange === "NASDAQ");
+        return res.filter((item: Asset) => item.exchange === "NASDAQ");
     }
 }
