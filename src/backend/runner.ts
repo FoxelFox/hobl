@@ -12,10 +12,13 @@ export class Runner {
     }
 
     run () {
-        const nvda = this.market.listings['nvda'];
+
+        console.log("start analyse nvda")
+        const nvda = this.market.listings['NVDA'];
 
         for (const priceAction of nvda.priceActions) {
             this.strategy.tick(priceAction);
         }
+        console.log("finished nvda")
     }
 }

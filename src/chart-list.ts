@@ -9,6 +9,15 @@ export class ChartList {
     models: {[key: string]: LstmModel} = {};
 
     constructor(private api: Api) {
+        this.debug().then()
+    }
+
+    async debug() {
+        const nvda = await this.api.getSymbol("NVDA");
+        console.log(nvda);
+    }
+
+    watch() {
         this.api.subscribe(async (data) => {
             for(const symbol in data) {
                 if (!this.charts[symbol]) {
@@ -41,6 +50,5 @@ export class ChartList {
             }
         });
     }
-
 
 }

@@ -16,14 +16,25 @@ export class Macd extends Strategy {
 
 
     tick(priceAction: RawPriceAction) {
+
+        let lastM: number, lastS: number;
+
+        if (this.macd.length) {
+            lastM = this.macd.at(-1).data;
+            lastS = this.signal.at(-1).data;
+        } else {
+            lastM = priceAction.o;
+            lastS = priceAction.o;
+        }
+
         this.macd.push({
             time: priceAction.t,
-            data: (this.macd.at(-1).data * this.m + priceAction.vw) / (this.m + 1)
+            data: (lastM * this.m + priceAction.vw) / (this.m + 1)
         });
 
         this.signal.push({
             time: priceAction.t,
-            data: (this.signal.at(-1).data * this.s + priceAction.vw) / (this.s + 1)
+            data: (lastS * this.s + priceAction.vw) / (this.s + 1)
         });
     }
 

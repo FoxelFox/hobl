@@ -103,4 +103,8 @@ export class Api {
             }])
         } as MessageEvent)
     }
+
+    async getSymbol(symbol: string) {
+        return  await (await fetch('api/result')).json();
+    }
 }

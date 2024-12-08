@@ -1,5 +1,6 @@
 import {Runner} from "./runner";
 
+console.log("start")
 
 class Backend {
 
@@ -11,10 +12,6 @@ class Backend {
     async main() {
         await this.runner.init();
         this.runner.run();
-
-
-
-
     }
 
     result() {
