@@ -9,7 +9,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build-web": "bun build src/main.ts --outdir=dist"
+    "build-web": "bun build src/main.ts --outdir=dist --watch"
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.22.0",

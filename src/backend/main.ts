@@ -5,20 +5,21 @@ console.log("start")
 class Backend {
 
     runner = new Runner();
+
+    result= () => {
+        return Response.json({
+            macd: this.runner.strategy.macd,
+            signal: this.runner.strategy.signal
+        });
+    }
+
     router = {
-        'api/result': this.result
+        '/api/result': this.result
     }
 
     async main() {
         await this.runner.init();
         this.runner.run();
-    }
-
-    result() {
-        return Response.json({
-            macd: this.runner.strategy.macd,
-            signal: this.runner.strategy.signal
-        });
     }
 }
 
@@ -32,7 +33,7 @@ backed.main().then(() => {
             let path = new URL(req.url).pathname;
 
             let p = path.split('/');
-            if (p[0] === "api") {
+            if (p[1] === "api") {
                 return backed.router[path]();
             }
 
