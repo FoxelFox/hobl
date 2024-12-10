@@ -1,19 +1,19 @@
 {
-  "name": "hobl",
-  "module": "src/main.ts",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "scripts": {
-    "build-web": "bun build src/main.ts --outdir=dist --watch"
-  },
-  "dependencies": {
-    "@tensorflow/tfjs": "^4.22.0",
-    "esbuild": "^0.24.0",
-    "lightweight-charts": "4.2.1"
-  }
+	"name": "hobl",
+	"module": "src/main.ts",
+	"type": "module",
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"scripts": {
+		"build-web": "bun build src/main.ts --outdir=dist --watch"
+	},
+	"dependencies": {
+		"@tensorflow/tfjs": "^4.22.0",
+		"esbuild": "^0.24.0",
+		"lightweight-charts": "4.2.1"
+	}
 }

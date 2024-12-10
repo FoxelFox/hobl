@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>hobl</title>
+	<meta charset="UTF-8">
+	<title>hobl</title>
 </head>
 <style>
-    html {
-        color: white;
-        background-color: #111;
-    }
-    body {
-        margin: 16px;
-    }
+	html {
+		color: white;
+		background-color: #111;
+	}
 
-    .grid {
-        display: grid;
+	body {
+		margin: 16px;
+	}
 
-        grid-template-columns: repeat(auto-fill, minmax(512px, 1fr));
-        grid-gap: 16px;
-    }
+	.grid {
+		display: grid;
 
-    .tv-lightweight-charts {
-        border-radius: 16px;
-    }
+		grid-template-columns: repeat(auto-fill, minmax(512px, 1fr));
+		grid-gap: 16px;
+	}
+
+	.tv-lightweight-charts {
+		border-radius: 16px;
+	}
 </style>
 <body>
-    <div class="grid" id="charts"></div>
-    <div id="micro-out-div"></div>
+<div class="grid" id="charts"></div>
+<div id="micro-out-div"></div>
 </body>
 <script type="module" src="dist/main.js"></script>
 </html>
