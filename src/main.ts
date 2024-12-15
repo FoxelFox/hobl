@@ -1,4 +1,4 @@
-import {Api, Price} from "./api";
+import {Api} from "./api";
 import {ChartList} from "./chart-list";
 
 const api = new Api();

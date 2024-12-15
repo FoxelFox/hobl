@@ -1,19 +1,10 @@
 import {Time} from "lightweight-charts";
+import {Candle} from "./shared/interfaces";
 
-export interface BasicPrice {
-	time: Time
-	value: number
-}
 
-export interface Price extends BasicPrice {
-	open: number
-	high: number
-	low: number
-	close: number
-}
 
 export interface Data {
-	[key: string]: Price[]
+	[key: string]: Candle[]
 }
 
 export class Api {
@@ -25,7 +16,7 @@ export class Api {
 	onmessage = (event: MessageEvent<any>) => {
 		const data = JSON.parse(event.data);
 
-		const priceDatas: { [key: string]: Price[] } = {};
+		const priceDatas: { [key: string]: Candle[] } = {};
 
 		// {"T":"b","S":"PLTR","o":61.9,"h":61.92,"l":61.88,"c":61.88,"v":821,"t":"2024-11-19T19:41:00Z","n":10,"vw":61.901923}
 		for (const entry of data) {

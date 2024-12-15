@@ -1,11 +1,13 @@
 import {Strategy} from "./strategy";
 import {Broker} from "../broker";
+import { TimeValue } from "../../shared/interfaces";
+
 
 export class Macd extends Strategy {
 
 
-	signal: { time: string, data: number }[] = [];
-	macd: { time: string, data: number }[] = [];
+	signal: TimeValue[] = [];
+	macd: { time: string, value: number }[] = [];
 
 	m = 7;
 	s = 14;
@@ -20,8 +22,8 @@ export class Macd extends Strategy {
 		let lastM: number, lastS: number;
 
 		if (this.macd.length) {
-			lastM = this.macd.at(-1).data;
-			lastS = this.signal.at(-1).data;
+			lastM = this.macd.at(-1).value;
+			lastS = this.signal.at(-1).value;
 		} else {
 			lastM = priceAction.o;
 			lastS = priceAction.o;
@@ -29,12 +31,12 @@ export class Macd extends Strategy {
 
 		this.macd.push({
 			time: priceAction.t,
-			data: (lastM * this.m + priceAction.vw) / (this.m + 1)
+			value: (lastM * this.m + priceAction.vw) / (this.m + 1)
 		});
 
 		this.signal.push({
 			time: priceAction.t,
-			data: (lastS * this.s + priceAction.vw) / (this.s + 1)
+			value: (lastS * this.s + priceAction.vw) / (this.s + 1)
 		});
 	}
 

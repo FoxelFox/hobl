@@ -1,16 +1,17 @@
-import {createChart} from 'lightweight-charts';
-import {BasicPrice, Price} from "./api";
+import {createChart, ISeriesApi, Time} from 'lightweight-charts';
+import {ChartSeries} from "./shared/interfaces";
+
 
 export class Chart {
 
-	areaSeries
-	candlestickSeries
+	areaSeries: {[key: string]: ISeriesApi<"Area", Time>}
+	candlestickSeries: {[key: string]: ISeriesApi<"Candlestick", Time>}
 	chart
 
 	min = Number.MAX_VALUE
 	max = Number.MIN_VALUE
 
-	constructor(private id: string) {
+	constructor(id: string, data: ChartSeries) {
 		this.chart = createChart(document.getElementById(id)!, {
 			watermark: {
 				visible: true,
@@ -36,27 +37,30 @@ export class Chart {
 		});
 
 		this.areaSeries = this.chart.addAreaSeries();
-
 		this.candlestickSeries = this.chart.addCandlestickSeries();
-		// candlestickSeries.setData([
-		//     // ... other data items
-		//     { time: '2018-12-31', open: 109.87, high: 114.69, low: 85.66, close: 111.26 },
-		// ]);
 
+		this.update(data);
 	}
 
-	update(data: Price[]) {
-		for (const entry of data) {
-			this.min = Math.min(this.min, entry.low);
-			this.max = Math.min(this.max, entry.high);
-			this.candlestickSeries.update(entry);
-
-			// is this needed?
-
+	update(data: ChartSeries) {
+		if (data.candles) {
+			for (const series of data.candles) {
+				for (const entry of series.data) {
+					this.min = Math.min(this.min, entry.low);
+					this.max = Math.min(this.max, entry.high);
+					this.candlestickSeries[series.id].update(entry);
+				}
+			}
 		}
-	}
 
-	drawPrediction(data: BasicPrice[]) {
-		this.areaSeries.setData(data);
+		if (data.areas) {
+			for (const series of data.areas) {
+				for (const entry of series.data) {
+					this.min = Math.min(this.min, entry.value);
+					this.max = Math.min(this.max, entry.value);
+					this.areaSeries[series.id].update(entry);
+				}
+			}
+		}
 	}
 }

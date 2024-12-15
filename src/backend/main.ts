@@ -1,4 +1,5 @@
 import {Runner} from "./runner";
+import {ChartSeries} from "../shared/interfaces"
 
 console.log("start")
 
@@ -7,10 +8,18 @@ class Backend {
 	runner = new Runner();
 
 	result = () => {
-		return Response.json({
-			macd: this.runner.strategy.macd,
-			signal: this.runner.strategy.signal
-		});
+
+		let charts: ChartSeries = {
+			areas: [{
+				id: 'macd',
+				data: this.runner.strategy.macd
+			}, {
+				id: 'signal',
+				data: this.runner.strategy.signal
+			}]
+		}
+
+		return Response.json(charts);
 	}
 
 	router = {
@@ -54,4 +63,3 @@ backed.main().then(() => {
 		},
 	});
 });
-
