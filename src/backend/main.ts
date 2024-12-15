@@ -10,12 +10,18 @@ class Backend {
 	result = () => {
 
 		let charts: ChartSeries = {
-			areas: [{
+			lines: [{
 				id: 'macd',
-				data: this.runner.strategy.macd
+				data: this.runner.strategy.macd,
+				color: "#00FF00"
 			}, {
 				id: 'signal',
-				data: this.runner.strategy.signal
+				data: this.runner.strategy.signal,
+				color: "#FFAA00"
+			}],
+			candles: [{
+				id: 'stock',
+				data: this.runner.strategy.stock
 			}]
 		}
 

@@ -9,7 +9,7 @@
 		"typescript": "^5.0.0"
 	},
 	"scripts": {
-		"web": "bun build src/main.ts --outdir=dist --watch",
+		"web": "bun build src/main.ts --outdir=dist --watch --sourcemap",
 		"backend": "bun src/backend/main.ts --watch"
 	},
 	"dependencies": {

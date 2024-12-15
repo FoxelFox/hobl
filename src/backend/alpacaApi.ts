@@ -16,7 +16,7 @@ export class AlpacaApi {
 		const url = [
 			`https://data.alpaca.markets/v2/stocks/bars?symbols=${symbol}`,
 			`timeframe=1D`,
-			`start=2020-01-03`,
+			`start=2018-01-01`,
 			`limit=10000`,
 			`adjustment=all`,
 			`feed=sip`,

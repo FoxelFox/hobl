@@ -2,7 +2,7 @@ import {Time} from "lightweight-charts";
 
 export interface TimeValue {
 	time: string | Time
-	value: number
+	value?: number
 }
 
 export interface Candle extends TimeValue {
@@ -12,13 +12,19 @@ export interface Candle extends TimeValue {
 	close: number
 }
 
+export interface ValueSeries {
+	id: string
+	data: TimeValue[]
+	color?: string
+}
+
+export interface CandleSeries {
+	id: string
+	data: Candle[]
+}
+
 export interface ChartSeries {
-	areas?: {
-		id: string
-		data: TimeValue[]
-	}[]
-	candles?: {
-		id: string
-		data: Candle[]
-	}[]
+	areas?:ValueSeries[]
+	lines?: ValueSeries[]
+	candles?: CandleSeries[]
 }

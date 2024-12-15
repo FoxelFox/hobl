@@ -25,9 +25,6 @@ export class ChartList {
 			);
 			this.charts[symbol] = new Chart(symbol, data);
 		}
-
-		this.charts[symbol].update(data[symbol]);
-
 	}
 
 	// watch() {

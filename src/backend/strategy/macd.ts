@@ -1,6 +1,6 @@
 import {Strategy} from "./strategy";
 import {Broker} from "../broker";
-import { TimeValue } from "../../shared/interfaces";
+import {Candle, CandleSeries, TimeValue} from "../../shared/interfaces";
 
 
 export class Macd extends Strategy {
@@ -8,9 +8,10 @@ export class Macd extends Strategy {
 
 	signal: TimeValue[] = [];
 	macd: { time: string, value: number }[] = [];
+	stock: Candle[] = [];
 
-	m = 7;
-	s = 14;
+	m = 100;
+	s = 50;
 
 	constructor(broker: Broker) {
 		super(broker);
@@ -37,6 +38,14 @@ export class Macd extends Strategy {
 		this.signal.push({
 			time: priceAction.t,
 			value: (lastS * this.s + priceAction.vw) / (this.s + 1)
+		});
+
+		this.stock.push({
+			time: priceAction.t,
+			open: priceAction.o,
+			close: priceAction.c,
+			low: priceAction.l,
+			high: priceAction.h
 		});
 	}
 
