@@ -22,7 +22,8 @@ class Backend {
 			candles: [{
 				id: 'stock',
 				data: this.runner.strategy.stock
-			}]
+			}],
+			markers: this.runner.strategy.marker
 		}
 
 		return Response.json(charts);

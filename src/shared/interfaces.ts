@@ -1,4 +1,4 @@
-import {Time} from "lightweight-charts";
+import {SeriesMarker, Time} from "lightweight-charts";
 
 export interface TimeValue {
 	time: string | Time
@@ -27,4 +27,5 @@ export interface ChartSeries {
 	areas?:ValueSeries[]
 	lines?: ValueSeries[]
 	candles?: CandleSeries[]
+	markers?: SeriesMarker<string>[]
 }
