@@ -1,11 +1,13 @@
 import {Runner} from "./runner";
 import {ChartSeries} from "../shared/interfaces"
+import {Market} from "./market";
 
 console.log("start")
 
 class Backend {
 
-	runner = new Runner();
+	market = new Market();
+	runner = new Runner(this.market);
 
 	result = () => {
 

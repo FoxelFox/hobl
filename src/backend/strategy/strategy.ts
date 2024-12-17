@@ -2,11 +2,11 @@ import {Broker} from "../broker";
 
 export abstract class Strategy {
 
-	constructor(private broker: Broker) {
+	constructor(protected broker: Broker) {
 
 	}
 
-	abstract tick(priceAction: RawPriceAction)
+	abstract tick(index: number, priceAction: RawPriceAction)
 
 	abstract tune()
 }

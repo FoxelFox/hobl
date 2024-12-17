@@ -3,22 +3,25 @@ import {Broker} from "./broker";
 import {Macd} from "./strategy/macd";
 
 export class Runner {
-	market = new Market();
-	broker = new Broker(this.market);
-	strategy = new Macd(this.broker);
+	broker: Broker
+	strategy: Macd
+
+	constructor(private market: Market) {
+		this.broker = new Broker(this.market);
+		this.strategy = new Macd('NVDA', this.broker);
+	}
 
 	async init() {
 		await this.market.init();
 	}
 
 	run() {
-
-		console.log("start analyse nvda")
 		const nvda = this.market.listings['NVDA'];
 
+		let index = 0;
 		for (const priceAction of nvda.priceActions) {
-			this.strategy.tick(priceAction);
+			this.strategy.tick(index, priceAction);
 		}
-		console.log("finished nvda")
+		console.log(`Finished NVDA | ${this.broker.cash}`)
 	}
 }

@@ -12,17 +12,17 @@ export class Macd extends Strategy {
 	stock: Candle[] = [];
 	marker: SeriesMarker<string>[] = [];
 
-	m = 100;
-	s = 50;
+	m = 14;
+	s = 7;
 
 	isLong: boolean = false;
 
-	constructor(broker: Broker) {
+	constructor(private symbol: string, broker: Broker) {
 		super(broker);
 	}
 
 
-	tick(priceAction: RawPriceAction) {
+	tick(index: number, priceAction: RawPriceAction) {
 
 		let lastM: number, lastS: number;
 
@@ -38,7 +38,6 @@ export class Macd extends Strategy {
 		const signal = (lastS * this.s + priceAction.vw) / (this.s + 1);
 
 
-
 		// actions
 		if (this.stock.length > 15) {
 			if(macd < signal && !this.isLong) {
@@ -51,6 +50,11 @@ export class Macd extends Strategy {
 					text: `buy @ ${priceAction.vw}`,
 					position: 'belowBar'
 				})
+
+
+				if (!this.broker.buy(index, this.symbol, 100)) {
+					// buy failed
+				}
 			}
 
 			if (macd > signal && this.isLong) {
@@ -62,7 +66,10 @@ export class Macd extends Strategy {
 					shape: 'arrowDown',
 					text: `sell @ ${priceAction.vw}`,
 					position: 'aboveBar'
-				})
+				});
+				if (!this.broker.sell(index, this.symbol, 100)) {
+					// sell failed
+				}
 			}
 		}
 
