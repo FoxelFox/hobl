@@ -7,18 +7,18 @@ console.log("start")
 class Backend {
 
 	market = new Market();
-	runner = new Runner(this.market);
+	runner = new Runner(this.market, 'NVDA');
 
 	result = () => {
 
 		let charts: ChartSeries = {
 			lines: [{
 				id: 'macd',
-				data: this.runner.strategy.macd,
+				data: this.runner.strategy.signal,
 				color: "#00FF00"
 			}, {
 				id: 'signal',
-				data: this.runner.strategy.signal,
+				data: this.runner.strategy.macd,
 				color: "#FFAA00"
 			}],
 			candles: [{

@@ -7,13 +7,13 @@ import {SeriesMarker} from "lightweight-charts";
 export class Macd extends Strategy {
 
 
-	signal: TimeValue[] = [];
-	macd: { time: string, value: number }[] = [];
+	macd: TimeValue[] = [];
+	signal: { time: string, value: number }[] = [];
 	stock: Candle[] = [];
 	marker: SeriesMarker<string>[] = [];
 
-	m = 14;
-	s = 7;
+	s = 14;
+	m = 7;
 
 	isLong: boolean = false;
 
@@ -26,16 +26,16 @@ export class Macd extends Strategy {
 
 		let lastM: number, lastS: number;
 
-		if (this.macd.length) {
-			lastM = this.macd.at(-1).value;
-			lastS = this.signal.at(-1).value;
+		if (this.signal.length) {
+			lastM = this.signal.at(-1).value;
+			lastS = this.macd.at(-1).value;
 		} else {
 			lastM = priceAction.o;
 			lastS = priceAction.o;
 		}
 
-		const macd = (lastM * this.m + priceAction.vw) / (this.m + 1);
-		const signal = (lastS * this.s + priceAction.vw) / (this.s + 1);
+		const macd = (lastM * this.s + priceAction.vw) / (this.s + 1);
+		const signal = (lastS * this.m + priceAction.vw) / (this.m + 1);
 
 
 		// actions
@@ -67,18 +67,19 @@ export class Macd extends Strategy {
 					text: `sell @ ${priceAction.vw}`,
 					position: 'aboveBar'
 				});
-				if (!this.broker.sell(index, this.symbol, 100)) {
+
+				if (!this.broker.sell(index, this.symbol, this.broker.positions[this.symbol])) {
 					// sell failed
 				}
 			}
 		}
 
-		this.macd.push({
+		this.signal.push({
 			time: priceAction.t,
 			value: macd
 		});
 
-		this.signal.push({
+		this.macd.push({
 			time: priceAction.t,
 			value: signal
 		});
@@ -90,14 +91,23 @@ export class Macd extends Strategy {
 			low: priceAction.l,
 			high: priceAction.h
 		});
-
-
 	}
 
+	finish() {
+		super.finish();
+		this.isLong = false;
+	}
 
-
+	reset() {
+		super.reset();
+		this.macd.length = 0;
+		this.signal.length = 0;
+		this.stock.length = 0;
+		this.marker.length = 0;
+	}
 
 	tune() {
-
+		this.s = Math.round(Math.random() * 200);
+		this.m = Math.round(Math.random() * 200);
 	}
 }

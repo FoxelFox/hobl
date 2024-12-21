@@ -2,8 +2,11 @@ import {Market} from "./market";
 
 export class Broker {
 
-	cash: number = 1000;
+	readonly startCash = 100;
+
+	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
+	transactions: number = 0;
 
 	constructor(private market: Market) {
 
@@ -22,7 +25,7 @@ export class Broker {
 		this.cash -= amount;
 		this.positions[symbol] += shares;
 
-		console.log(`B ${shares.toFixed(2)}x${symbol}@${price.toFixed(2)}`)
+		this.transactions++;
 
 		return true;
 	}
@@ -36,10 +39,25 @@ export class Broker {
 		const price = this.market.listings[symbol].priceActions[index].vw;
 
 		this.cash += amount * price;
-		this.positions[symbol] += amount;
+		this.positions[symbol] -= amount;
 
-		console.log(`S ${amount.toFixed(2)}x${symbol}@${price.toFixed(2)}`)
+		this.transactions++;
 
 		return true;
+	}
+
+	sellAllPositions() {
+		for (const key in this.positions) {
+			const index = this.market.listings[key].priceActions.length -1;
+			this.sell(index, key, this.positions[key]);
+		}
+	}
+
+	reset() {
+		this.cash = this.startCash;
+		this.transactions = 0;
+		for (const key in this.positions) {
+			this.positions[key] = 0;
+		}
 	}
 }

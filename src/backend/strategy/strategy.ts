@@ -9,4 +9,12 @@ export abstract class Strategy {
 	abstract tick(index: number, priceAction: RawPriceAction)
 
 	abstract tune()
+
+	finish() {
+		this.broker.sellAllPositions();
+	}
+
+	reset() {
+		this.broker.reset();
+	}
 }
