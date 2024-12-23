@@ -15,8 +15,8 @@ export class AlpacaApi {
 
 		const url = [
 			`https://data.alpaca.markets/v2/stocks/bars?symbols=${symbol}`,
-			`timeframe=1D`,
-			`start=2018-01-01`,
+			`timeframe=1Min`,
+			`start=2024-12-01`,
 			`limit=10000`,
 			`adjustment=all`,
 			`feed=sip`,
@@ -46,6 +46,6 @@ export class AlpacaApi {
 				})
 			})).json();
 
-		return res.filter((item: Asset) => item.exchange === "NASDAQ");
+		return res;
 	}
 }

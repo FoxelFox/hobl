@@ -27,5 +27,5 @@ export interface ChartSeries {
 	areas?:ValueSeries[]
 	lines?: ValueSeries[]
 	candles?: CandleSeries[]
-	markers?: SeriesMarker<string>[]
+	markers?: SeriesMarker<Time>[]
 }

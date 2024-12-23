@@ -14,6 +14,8 @@ export class Market {
 		await this.api.init();
 		const assets = await this.api.getSymbols();
 
+		//console.table(assets, ['class', 'exchange', 'symbol', 'name'])
+
 		// first only nvidia
 		const nvda = assets.find(e => e.symbol === 'NVDA');
 

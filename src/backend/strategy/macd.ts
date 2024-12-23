@@ -1,21 +1,27 @@
 import {Strategy} from "./strategy";
 import {Broker} from "../broker";
 import {Candle, CandleSeries, TimeValue} from "../../shared/interfaces";
-import {SeriesMarker} from "lightweight-charts";
+import {SeriesMarker, Time} from "lightweight-charts";
 
 
 export class Macd extends Strategy {
 
 
 	macd: TimeValue[] = [];
-	signal: { time: string, value: number }[] = [];
+	signal: TimeValue[] = [];
 	stock: Candle[] = [];
-	marker: SeriesMarker<string>[] = [];
+	marker: SeriesMarker<Time>[] = [];
 
 	s = 14;
 	m = 7;
 
-	isLong: boolean = false;
+	min: number = Number.MAX_VALUE;
+	max: number = 0;
+
+	isMacdLong: boolean = false;
+	isInvested: boolean = false;
+
+	trailingStopLoss = 0.005;
 
 	constructor(private symbol: string, broker: Broker) {
 		super(broker);
@@ -23,6 +29,9 @@ export class Macd extends Strategy {
 
 
 	tick(index: number, priceAction: RawPriceAction) {
+
+		this.min = Math.min(this.min, priceAction.l);
+		this.max = Math.max(this.max, priceAction.h);
 
 		let lastM: number, lastS: number;
 
@@ -38,13 +47,41 @@ export class Macd extends Strategy {
 		const signal = (lastS * this.m + priceAction.vw) / (this.m + 1);
 
 
-		// actions
+		// MACD
 		if (this.stock.length > 15) {
-			if(macd < signal && !this.isLong) {
+			if(macd < signal && !this.isMacdLong) {
 				// BUY
-				this.isLong = true;
+				this.isMacdLong = true;
+			}
+
+			if (macd > signal && this.isMacdLong) {
+				// SELL
+				this.isMacdLong = false;
+			}
+		}
+
+		// trailing stops
+		if (this.isInvested) {
+			const stopLoss = (this.min * (1 - this.trailingStopLoss))
+			if (!this.isMacdLong || priceAction.h < stopLoss) {
 				this.marker.push({
-					time: priceAction.t,
+					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
+					color: '#FF0000',
+					shape: 'arrowDown',
+					text: `sell @ ${priceAction.vw}`,
+					position: 'aboveBar'
+				});
+
+				if (!this.broker.sell(index, this.symbol, this.broker.positions[this.symbol])) {
+					// sell failed
+				}
+				this.isInvested = false;
+				this.resetStopLoss();
+			}
+		} else if (!this.isInvested) {
+			if (this.isMacdLong) {
+				this.marker.push({
+					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 					color: '#00FF00',
 					shape: 'arrowUp',
 					text: `buy @ ${priceAction.vw}`,
@@ -55,37 +92,24 @@ export class Macd extends Strategy {
 				if (!this.broker.buy(index, this.symbol, 100)) {
 					// buy failed
 				}
-			}
 
-			if (macd > signal && this.isLong) {
-				// SELL
-				this.isLong = false;
-				this.marker.push({
-					time: priceAction.t,
-					color: '#FF0000',
-					shape: 'arrowDown',
-					text: `sell @ ${priceAction.vw}`,
-					position: 'aboveBar'
-				});
-
-				if (!this.broker.sell(index, this.symbol, this.broker.positions[this.symbol])) {
-					// sell failed
-				}
+				this.isInvested = true;
+				this.resetStopLoss();
 			}
 		}
 
 		this.signal.push({
-			time: priceAction.t,
+			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 			value: macd
 		});
 
 		this.macd.push({
-			time: priceAction.t,
+			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 			value: signal
 		});
 
 		this.stock.push({
-			time: priceAction.t,
+			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 			open: priceAction.o,
 			close: priceAction.c,
 			low: priceAction.l,
@@ -95,7 +119,8 @@ export class Macd extends Strategy {
 
 	finish() {
 		super.finish();
-		this.isLong = false;
+		this.isMacdLong = false;
+		this.isInvested = false;
 	}
 
 	reset() {
@@ -104,6 +129,12 @@ export class Macd extends Strategy {
 		this.signal.length = 0;
 		this.stock.length = 0;
 		this.marker.length = 0;
+		this.resetStopLoss();
+	}
+
+	resetStopLoss() {
+		this.min = Number.MAX_VALUE;
+		this.max = 0;
 	}
 
 	tune() {
