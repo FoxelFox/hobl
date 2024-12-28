@@ -20,8 +20,10 @@ export class Macd extends Strategy {
 
 	isMacdLong: boolean = false;
 	isInvested: boolean = false;
-
-	trailingStopLoss = 0.005;
+	buyNow: boolean = false;
+	trailingPStopProfit = 0.01;
+	trailingStopLoss = 0.01;
+	buyIn: number = 0;
 
 	constructor(private symbol: string, broker: Broker) {
 		super(broker);
@@ -30,8 +32,8 @@ export class Macd extends Strategy {
 
 	tick(index: number, priceAction: RawPriceAction) {
 
-		this.min = Math.min(this.min, priceAction.l);
-		this.max = Math.max(this.max, priceAction.h);
+		this.min = Math.min(this.min, priceAction.vw);
+		this.max = Math.max(this.max, priceAction.vw);
 
 		let lastM: number, lastS: number;
 
@@ -52,6 +54,7 @@ export class Macd extends Strategy {
 			if(macd < signal && !this.isMacdLong) {
 				// BUY
 				this.isMacdLong = true;
+				this.buyNow = true;
 			}
 
 			if (macd > signal && this.isMacdLong) {
@@ -61,9 +64,10 @@ export class Macd extends Strategy {
 		}
 
 		// trailing stops
-		if (this.isInvested) {
+		if (this.isInvested && !this.buyNow) {
+			const stopProfit = (this.max * (1 - this.trailingPStopProfit))
 			const stopLoss = (this.min * (1 - this.trailingStopLoss))
-			if (!this.isMacdLong || priceAction.h < stopLoss) {
+			if (this.buyIn > stopLoss || priceAction.vw < stopProfit) {
 				this.marker.push({
 					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 					color: '#FF0000',
@@ -75,27 +79,29 @@ export class Macd extends Strategy {
 				if (!this.broker.sell(index, this.symbol, this.broker.positions[this.symbol])) {
 					// sell failed
 				}
+				this.buyIn = 0; // TODO multiple buys ???
 				this.isInvested = false;
 				this.resetStopLoss();
 			}
-		} else if (!this.isInvested) {
-			if (this.isMacdLong) {
-				this.marker.push({
-					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
-					color: '#00FF00',
-					shape: 'arrowUp',
-					text: `buy @ ${priceAction.vw}`,
-					position: 'belowBar'
-				})
+		}
+		if (!this.isInvested && this.buyNow) {
+			this.marker.push({
+				time: (new Date(priceAction.t)).getTime() / 1000 as Time,
+				color: '#00FF00',
+				shape: 'arrowUp',
+				text: `buy @ ${priceAction.vw}`,
+				position: 'belowBar'
+			})
 
 
-				if (!this.broker.buy(index, this.symbol, 100)) {
-					// buy failed
-				}
-
-				this.isInvested = true;
-				this.resetStopLoss();
+			if (!this.broker.buy(index, this.symbol, 100)) {
+				// buy failed
 			}
+
+
+			this.buyIn = priceAction.vw; // TODO multiple buys ???
+			this.isInvested = true;
+			this.resetStopLoss();
 		}
 
 		this.signal.push({
@@ -115,6 +121,8 @@ export class Macd extends Strategy {
 			low: priceAction.l,
 			high: priceAction.h
 		});
+
+		this.buyNow = false;
 	}
 
 	finish() {
@@ -135,6 +143,7 @@ export class Macd extends Strategy {
 	resetStopLoss() {
 		this.min = Number.MAX_VALUE;
 		this.max = 0;
+		this.buyIn = 0;
 	}
 
 	tune() {

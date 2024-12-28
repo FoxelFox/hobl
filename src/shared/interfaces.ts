@@ -15,7 +15,10 @@ export interface Candle extends TimeValue {
 export interface ValueSeries {
 	id: string
 	data: TimeValue[]
-	color?: string
+	color?: string,
+	lineWidth?: number,
+	lineStyle?: number,
+	axisLabelVisible?: boolean
 }
 
 export interface CandleSeries {

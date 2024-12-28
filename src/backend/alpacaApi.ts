@@ -15,7 +15,7 @@ export class AlpacaApi {
 
 		const url = [
 			`https://data.alpaca.markets/v2/stocks/bars?symbols=${symbol}`,
-			`timeframe=1Min`,
+			`timeframe=5Min`,
 			`start=2024-12-01`,
 			`limit=10000`,
 			`adjustment=all`,

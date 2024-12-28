@@ -12,15 +12,21 @@ class Backend {
 	result = () => {
 
 		let charts: ChartSeries = {
-			// lines: [{
-			// 	id: 'macd',
-			// 	data: this.runner.strategy.signal,
-			// 	color: "#00FF00"
-			// }, {
-			// 	id: 'signal',
-			// 	data: this.runner.strategy.macd,
-			// 	color: "#FFAA00"
-			// }],
+			lines: [{
+				id: 'macd',
+				data: this.runner.strategy.fast,
+				color: "#00FF00",
+				lineWidth: 1,
+				lineStyle: 2,
+				axisLabelVisible: false
+			}, {
+				id: 'signal',
+				data: this.runner.strategy.slow,
+				color: "#FFAA00",
+				lineWidth: 1,
+				lineStyle: 2,
+				axisLabelVisible: false
+			}],
 			candles: [{
 				id: 'stock',
 				data: this.runner.strategy.stock
