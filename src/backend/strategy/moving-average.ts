@@ -4,21 +4,21 @@ import {Candle, CandleSeries, TimeValue} from "../../shared/interfaces";
 import {SeriesMarker, Time} from "lightweight-charts";
 
 
-export class Macd extends Strategy {
+export class MovingAverage extends Strategy {
 
 
-	macd: TimeValue[] = [];
-	signal: TimeValue[] = [];
+	slow: TimeValue[] = [];
+	fast: TimeValue[] = [];
 	stock: Candle[] = [];
 	marker: SeriesMarker<Time>[] = [];
 
 	s = 14;
-	m = 7;
+	f = 7;
 
 	min: number = Number.MAX_VALUE;
 	max: number = 0;
 
-	isMacdLong: boolean = false;
+	isLong: boolean = false;
 	isInvested: boolean = false;
 	buyNow: boolean = false;
 	trailingPStopProfit = 0.01;
@@ -37,29 +37,28 @@ export class Macd extends Strategy {
 
 		let lastM: number, lastS: number;
 
-		if (this.signal.length) {
-			lastM = this.signal.at(-1).value;
-			lastS = this.macd.at(-1).value;
+		if (this.fast.length) {
+			lastM = this.fast.at(-1).value;
+			lastS = this.slow.at(-1).value;
 		} else {
 			lastM = priceAction.o;
 			lastS = priceAction.o;
 		}
 
-		const macd = (lastM * this.s + priceAction.vw) / (this.s + 1);
-		const signal = (lastS * this.m + priceAction.vw) / (this.m + 1);
+		const slow = (lastM * this.s + priceAction.vw) / (this.s + 1);
+		const fast = (lastS * this.f + priceAction.vw) / (this.f + 1);
 
 
-		// MACD
 		if (this.stock.length > 15) {
-			if(macd < signal && !this.isMacdLong) {
+			if(slow < fast && !this.isLong) {
 				// BUY
-				this.isMacdLong = true;
+				this.isLong = true;
 				this.buyNow = true;
 			}
 
-			if (macd > signal && this.isMacdLong) {
+			if (slow > fast && this.isLong) {
 				// SELL
-				this.isMacdLong = false;
+				this.isLong = false;
 			}
 		}
 
@@ -104,14 +103,14 @@ export class Macd extends Strategy {
 			this.resetStopLoss();
 		}
 
-		this.signal.push({
+		this.fast.push({
 			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
-			value: macd
+			value: slow
 		});
 
-		this.macd.push({
+		this.slow.push({
 			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
-			value: signal
+			value: fast
 		});
 
 		this.stock.push({
@@ -127,14 +126,14 @@ export class Macd extends Strategy {
 
 	finish() {
 		super.finish();
-		this.isMacdLong = false;
+		this.isLong = false;
 		this.isInvested = false;
 	}
 
 	reset() {
 		super.reset();
-		this.macd.length = 0;
-		this.signal.length = 0;
+		this.slow.length = 0;
+		this.fast.length = 0;
 		this.stock.length = 0;
 		this.marker.length = 0;
 		this.resetStopLoss();
@@ -148,6 +147,6 @@ export class Macd extends Strategy {
 
 	tune() {
 		this.s = Math.round(Math.random() * 200);
-		this.m = Math.round(Math.random() * 200);
+		this.f = Math.round(Math.random() * 200);
 	}
 }
