@@ -14,14 +14,14 @@ class Backend {
 		let charts: ChartSeries = {
 			lines: [{
 				id: 'macd',
-				data: this.runner.strategy.fast,
+				data: this.runner.strategy.slow,
 				color: "#00FF00",
 				lineWidth: 1,
 				lineStyle: 2,
 				axisLabelVisible: false
 			}, {
 				id: 'signal',
-				data: this.runner.strategy.slow,
+				data: this.runner.strategy.fast,
 				color: "#FFAA00",
 				lineWidth: 1,
 				lineStyle: 2,

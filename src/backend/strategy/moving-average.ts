@@ -7,8 +7,8 @@ import {SeriesMarker, Time} from "lightweight-charts";
 export class MovingAverage extends Strategy {
 
 
-	slow: TimeValue[] = [];
 	fast: TimeValue[] = [];
+	slow: TimeValue[] = [];
 	stock: Candle[] = [];
 	marker: SeriesMarker<Time>[] = [];
 
@@ -21,8 +21,8 @@ export class MovingAverage extends Strategy {
 	isLong: boolean = false;
 	isInvested: boolean = false;
 	buyNow: boolean = false;
-	trailingPStopProfit = 0.01;
-	trailingStopLoss = 0.01;
+	stopProfit = 0.01;
+	stopLoss = 0.01;
 	buyIn: number = 0;
 
 	constructor(private symbol: string, broker: Broker) {
@@ -32,22 +32,33 @@ export class MovingAverage extends Strategy {
 
 	tick(index: number, priceAction: RawPriceAction) {
 
+		this.stock.push({
+			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
+			open: priceAction.o,
+			close: priceAction.c,
+			low: priceAction.l,
+			high: priceAction.h,
+			vwap: priceAction.vw
+		});
+
+		if (this.stock.length < this.s || this.stock.length < this.f ) {
+			return
+		}
+
 		this.min = Math.min(this.min, priceAction.vw);
 		this.max = Math.max(this.max, priceAction.vw);
 
-		let lastM: number, lastS: number;
-
-		if (this.fast.length) {
-			lastM = this.fast.at(-1).value;
-			lastS = this.slow.at(-1).value;
-		} else {
-			lastM = priceAction.o;
-			lastS = priceAction.o;
+		let fast = 0;
+		for (let i = this.stock.length - this.f, l = this.stock.length; i < l; ++i) {
+			fast += this.stock[i].vwap
 		}
+		fast = fast / this.f;
 
-		const slow = (lastM * this.s + priceAction.vw) / (this.s + 1);
-		const fast = (lastS * this.f + priceAction.vw) / (this.f + 1);
-
+		let slow = 0;
+		for (let i = this.stock.length - this.s, l = this.stock.length; i < l; ++i) {
+			slow += this.stock[i].vwap
+		}
+		slow = slow / this.s;
 
 		if (this.stock.length > 15) {
 			if(slow < fast && !this.isLong) {
@@ -63,10 +74,11 @@ export class MovingAverage extends Strategy {
 		}
 
 		// trailing stops
+
 		if (this.isInvested && !this.buyNow) {
-			const stopProfit = (this.max * (1 - this.trailingPStopProfit))
-			const stopLoss = (this.min * (1 - this.trailingStopLoss))
-			if (this.buyIn > stopLoss || priceAction.vw < stopProfit) {
+			const stopProfit = (this.max * (1 - this.stopProfit))
+			const stopLoss = (this.min * (1 - this.stopLoss))
+			if (this.buyIn > stopLoss || priceAction.vw < stopProfit || !this.isLong) {
 				this.marker.push({
 					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 					color: '#FF0000',
@@ -83,6 +95,8 @@ export class MovingAverage extends Strategy {
 				this.resetStopLoss();
 			}
 		}
+
+
 		if (!this.isInvested && this.buyNow) {
 			this.marker.push({
 				time: (new Date(priceAction.t)).getTime() / 1000 as Time,
@@ -103,23 +117,17 @@ export class MovingAverage extends Strategy {
 			this.resetStopLoss();
 		}
 
-		this.fast.push({
+		this.slow.push({
 			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 			value: slow
 		});
 
-		this.slow.push({
+		this.fast.push({
 			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 			value: fast
 		});
 
-		this.stock.push({
-			time: (new Date(priceAction.t)).getTime() / 1000 as Time,
-			open: priceAction.o,
-			close: priceAction.c,
-			low: priceAction.l,
-			high: priceAction.h
-		});
+
 
 		this.buyNow = false;
 	}
@@ -132,8 +140,10 @@ export class MovingAverage extends Strategy {
 
 	reset() {
 		super.reset();
-		this.slow.length = 0;
+		this.s = 14;
+		this.f = 7;
 		this.fast.length = 0;
+		this.slow.length = 0;
 		this.stock.length = 0;
 		this.marker.length = 0;
 		this.resetStopLoss();
@@ -146,7 +156,9 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.s = Math.round(Math.random() * 200);
-		this.f = Math.round(Math.random() * 200);
+		this.s = Math.round(Math.random() * 1440) + 1;
+		this.f = Math.round(Math.random() * 1440) + 1;
+		this.stopProfit = Math.random();
+		this.stopLoss = Math.random();
 	}
 }

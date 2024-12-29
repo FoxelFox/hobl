@@ -10,6 +10,7 @@ export interface Candle extends TimeValue {
 	high: number
 	low: number
 	close: number
+	vwap: number
 }
 
 export interface ValueSeries {

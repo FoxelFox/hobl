@@ -2,7 +2,7 @@ import {Market} from "./market";
 
 export class Broker {
 
-	readonly startCash = 1000;
+	readonly startCash = 100;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};

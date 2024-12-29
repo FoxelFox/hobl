@@ -15,56 +15,64 @@ export class Runner {
 		await this.market.init();
 	}
 
+
 	run() {
 		const nvda = this.market.listings[this.symbol];
 		const results = [];
 
+		let max = 0;
+		let hasImproved = false;
+		let epoch = 0;
 
-		for (let s = 0; s < 100; s += 1 ) {
-			for (let f = 0; f < 100; f += 1) {
-				for (let sp = 0.01; sp < 0.1; sp += 0.01) {
-					let index = 0;
-					this.strategy.s = s;
-					this.strategy.f = f;
-					this.strategy.trailingPStopProfit = sp;
-					for (const priceAction of nvda.priceActions) {
-						this.strategy.tick(index, priceAction);
-						index++;
-					}
+		do {
+			for (let i = 0; i < 10000; ++i) {
+				let index = 0;
+				this.strategy.tune();
 
-					this.strategy.finish();
-					//if (this.broker.transactions >= 25) {
-						// ignore buy and hold results
-						//if (this.broker.cash > 100) {
-							// only the ones who make profit
-							results.push({
-								symbol: this.symbol,
-								rating: this.broker.cash,
-								cash: `${this.broker.cash.toLocaleString('de',{maximumFractionDigits: 2})}`,
-								tx: this.broker.transactions,
-								fast: this.strategy.f,
-								slow: this.strategy.s,
-								stop: this.strategy.trailingPStopProfit.toFixed(2)
-							});
-						//}
-					//}
-
-					this.strategy.reset();
+				for (const priceAction of nvda.priceActions) {
+					this.strategy.tick(index, priceAction);
+					index++;
 				}
+
+				this.strategy.finish();
+				if (this.broker.transactions >= 2) {
+					// ignore buy and hold results
+					if (this.broker.cash > 100) {
+						// only the ones who make profit
+						results.push({
+							symbol: this.symbol,
+							rating: (this.broker.cash - 100) / (this.broker.transactions / 2),
+							//rating: (this.broker.cash - 100),
+							cash: `${this.broker.cash.toLocaleString('de',{maximumFractionDigits: 2})}`,
+							tx: this.broker.transactions,
+							fast: this.strategy.f,
+							slow: this.strategy.s,
+							stopProfit: this.strategy.stopProfit.toFixed(4),
+							stopLoss: this.strategy.stopLoss.toFixed(4)
+						});
+					}
+				}
+
+				this.strategy.reset();
 			}
-		}
+
+			results.sort((a,b) => (b.rating - a.rating ))
+			results.length = Math.min(8, results.length);
+
+			hasImproved = max < results.at(-1).rating;
+			max = Math.max(max, results.at(-1).rating);
+
+			console.log(`epoch ${epoch++}`)
+			console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'rating']);
+		} while (hasImproved);
 
 
-
-
-		results.sort((a,b) => b.rating - a.rating)
-		results.length = Math.min(8, results.length);
-
+		console.log("Done")
 
 		// restart the best setup
-		this.strategy.s = results[0].signal;
-		this.strategy.f = results[0].macd;
-		this.strategy.trailingPStopProfit = results[0].stopProfit;
+		this.strategy.s = results[0].slow;
+		this.strategy.f = results[0].fast;
+		this.strategy.stopLoss = results[0].stop;
 		// this.strategy.s = 48;
 		// this.strategy.m = 98;
 		// this.strategy.trailingPStopProfit = 0.006;
@@ -74,7 +82,5 @@ export class Runner {
 			this.strategy.tick(index, priceAction);
 			index++;
 		}
-
-		console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stop']);
 	}
 }
