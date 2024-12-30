@@ -25,7 +25,7 @@ export class Runner {
 		let epoch = 0;
 
 		do {
-			for (let i = 0; i < 10000; ++i) {
+			for (let i = 0; i < 1000; ++i) {
 				let index = 0;
 				this.strategy.tune();
 
@@ -35,14 +35,14 @@ export class Runner {
 				}
 
 				this.strategy.finish();
-				if (this.broker.transactions >= 2) {
+				if (this.broker.transactions >= 4) {
 					// ignore buy and hold results
 					if (this.broker.cash > 100) {
 						// only the ones who make profit
 						results.push({
 							symbol: this.symbol,
-							rating: (this.broker.cash - 100) / (this.broker.transactions / 2),
-							//rating: (this.broker.cash - 100),
+							//rating: (this.broker.cash - 100) / (this.broker.transactions / 2),
+							rating: (this.broker.cash - 100),
 							cash: `${this.broker.cash.toLocaleString('de',{maximumFractionDigits: 2})}`,
 							tx: this.broker.transactions,
 							fast: this.strategy.f,
@@ -62,6 +62,7 @@ export class Runner {
 			hasImproved = max < results.at(-1).rating;
 			max = Math.max(max, results.at(-1).rating);
 
+			console.clear();
 			console.log(`epoch ${epoch++}`)
 			console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'rating']);
 		} while (hasImproved);

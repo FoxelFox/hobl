@@ -14,6 +14,7 @@ export class MovingAverage extends Strategy {
 
 	s = 14;
 	f = 7;
+	minVolume = 1;
 
 	min: number = Number.MAX_VALUE;
 	max: number = 0;
@@ -38,7 +39,8 @@ export class MovingAverage extends Strategy {
 			close: priceAction.c,
 			low: priceAction.l,
 			high: priceAction.h,
-			vwap: priceAction.vw
+			vwap: priceAction.vw,
+			volume: priceAction.v
 		});
 
 		if (this.stock.length < this.s || this.stock.length < this.f ) {
@@ -156,8 +158,8 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.s = Math.round(Math.random() * 1440) + 1;
-		this.f = Math.round(Math.random() * 1440) + 1;
+		this.s = Math.round(Math.random() * 5000) + 1;
+		this.f = Math.round(Math.random() * 5000) + 1;
 		this.stopProfit = Math.random();
 		this.stopLoss = Math.random();
 	}

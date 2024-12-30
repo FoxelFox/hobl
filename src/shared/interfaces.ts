@@ -11,6 +11,7 @@ export interface Candle extends TimeValue {
 	low: number
 	close: number
 	vwap: number
+	volume: number
 }
 
 export interface ValueSeries {
