@@ -9,6 +9,7 @@ export class Broker {
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
+	leverage: number = 2;
 
 	constructor(private market: Market) {
 
@@ -34,13 +35,22 @@ export class Broker {
 
 
 	sell(index: number, symbol: string, amount: number): boolean {
-		if (this.positions[symbol] < amount) {
+		if (this.positions[symbol] < amount || amount === 0) {
 			return false;
 		}
 
 		const price = this.market.listings[symbol].priceActions[index].vw;
 
-		this.cash += amount * price;
+		const fiat = amount * price;
+
+		const last = this.history.at(-1);
+		if (last) {
+			this.cash += last.value + (fiat - last.value) * this.leverage;
+		} else {
+			this.cash += fiat;
+		}
+
+
 		this.positions[symbol] -= amount;
 
 		this.transactions++;

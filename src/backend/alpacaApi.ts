@@ -30,7 +30,7 @@ export class AlpacaApi {
 		if (bars.length) {
 			date = new Date(new Date(bars.at(-1).t).getTime() + 1000 * 60 * 60 * 24).toISOString().split('T')[0];
 		} else {
-			date = new Date(Date.now() - 1000 * 60 * 60 * 24 * 356 * 10).toISOString().split('T')[0];
+			date = new Date(Date.now() - 1000 * 60 * 60 * 24 * 365 * 10).toISOString().split('T')[0];
 		}
 
 		const url = [

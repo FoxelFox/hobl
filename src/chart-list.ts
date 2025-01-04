@@ -23,7 +23,7 @@ export class ChartList {
 	async createChart(data: ChartSeries) {
 		if (!this.charts[data.id]) {
 			document.getElementById("charts")!.insertAdjacentHTML("beforeend",
-				`<div id="${data.id}" style="height: 384px"></div>`
+				`<div id="${data.id}" style="height: 776px"></div>`
 			);
 			this.charts[data.id] = new Chart(data.id, data);
 		}

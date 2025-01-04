@@ -164,8 +164,8 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 60) + 1;
-		this.s = this.f + Math.round(Math.random() * 180) + 1;
+		this.f = Math.round(Math.random() * 5) + 1;
+		this.s = this.f + Math.round(Math.random() * 10) + 1;
 		//this.f = 20;
 		//this.s = 180;
 
