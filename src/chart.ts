@@ -36,13 +36,21 @@ export class Chart {
 
 		if (data.areas) {
 			for (const series of data.areas) {
-				this.areaSeries[series.id] = this.chart.addAreaSeries({color: series.color});
+				this.areaSeries[series.id] = this.chart.addAreaSeries({
+					color: series.color,
+					lineWidth: series.lineWidth,
+					lineStyle: series.lineStyle
+				});
 			}
 		}
 
 		if (data.lines) {
 			for (const series of data.lines) {
-				this.lineSeries[series.id] = this.chart.addLineSeries({color: series.color});
+				this.lineSeries[series.id] = this.chart.addLineSeries({
+					color: series.color,
+					lineWidth: series.lineWidth,
+					lineStyle: series.lineStyle
+				});
 			}
 		}
 

@@ -13,17 +13,19 @@ export class ChartList {
 	}
 
 	async debug() {
-		const nvda = await this.api.getSymbol("NVDA");
+		const charts = await this.api.getCharts();
 
-		await this.createChart("NVDA", nvda);
+		for (const chart of charts) {
+			await this.createChart(chart);
+		}
 	}
 
-	async createChart(symbol: string, data: ChartSeries) {
-		if (!this.charts[symbol]) {
+	async createChart(data: ChartSeries) {
+		if (!this.charts[data.id]) {
 			document.getElementById("charts")!.insertAdjacentHTML("beforeend",
-				`<div id="${symbol}" style="height: 384px"></div>`
+				`<div id="${data.id}" style="height: 384px"></div>`
 			);
-			this.charts[symbol] = new Chart(symbol, data);
+			this.charts[data.id] = new Chart(data.id, data);
 		}
 	}
 

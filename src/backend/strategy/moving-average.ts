@@ -14,7 +14,7 @@ export class MovingAverage extends Strategy {
 
 	s = 14;
 	f = 7;
-	minVolume = 1;
+	minPriceVolume = 1;
 
 	min: number = Number.MAX_VALUE;
 	max: number = 0;
@@ -25,6 +25,7 @@ export class MovingAverage extends Strategy {
 	stopProfit = 0.01;
 	stopLoss = 0.01;
 	buyIn: number = 0;
+	lastTradedDay: string;
 
 	constructor(private symbol: string, broker: Broker) {
 		super(broker);
@@ -40,8 +41,12 @@ export class MovingAverage extends Strategy {
 			low: priceAction.l,
 			high: priceAction.h,
 			vwap: priceAction.vw,
-			volume: priceAction.v
+			volume: priceAction.v * priceAction.vw
 		});
+
+		const time = new Date(priceAction.t);
+		const day = priceAction.t.split('T')[0];
+		const investedAllowedByTime = (time.getUTCHours() > 14 || (time.getUTCHours() === 14 && time.getUTCMinutes() > 30)) && (time.getUTCHours() < 20 || (time.getUTCHours() == 20 && time.getUTCMinutes() < 45));
 
 		if (this.stock.length < this.s || this.stock.length < this.f ) {
 			return
@@ -63,24 +68,24 @@ export class MovingAverage extends Strategy {
 		slow = slow / this.s;
 
 		if (this.stock.length > 15) {
-			if(slow < fast && !this.isLong) {
+			if(slow < fast && fast < priceAction.vw && !this.isLong && this.lastTradedDay !== day) {
 				// BUY
 				this.isLong = true;
 				this.buyNow = true;
 			}
 
-			if (slow > fast && this.isLong) {
+			if (slow > fast && fast > priceAction.vw && this.isLong) {
 				// SELL
 				this.isLong = false;
 			}
 		}
 
 		// trailing stops
+		const stopProfit = (this.max * (1 - this.stopProfit))
+		const stopLoss = (this.min * (1 - this.stopLoss))
 
-		if (this.isInvested && !this.buyNow) {
-			const stopProfit = (this.max * (1 - this.stopProfit))
-			const stopLoss = (this.min * (1 - this.stopLoss))
-			if (this.buyIn > stopLoss || priceAction.vw < stopProfit || !this.isLong) {
+		if (this.isInvested) {
+			if (this.buyIn > stopLoss || priceAction.vw < stopProfit || !investedAllowedByTime) {
 				this.marker.push({
 					time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 					color: '#FF0000',
@@ -94,12 +99,13 @@ export class MovingAverage extends Strategy {
 				}
 				this.buyIn = 0; // TODO multiple buys ???
 				this.isInvested = false;
+				this.lastTradedDay = day;
 				this.resetStopLoss();
 			}
 		}
 
 
-		if (!this.isInvested && this.buyNow) {
+		if (!this.isInvested && this.buyNow && investedAllowedByTime) {
 			this.marker.push({
 				time: (new Date(priceAction.t)).getTime() / 1000 as Time,
 				color: '#00FF00',
@@ -109,7 +115,7 @@ export class MovingAverage extends Strategy {
 			})
 
 
-			if (!this.broker.buy(index, this.symbol, 100)) {
+			if (!this.broker.buy(index, this.symbol, this.broker.cash)) {
 				// buy failed
 			}
 
@@ -158,9 +164,16 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.s = Math.round(Math.random() * 5000) + 1;
-		this.f = Math.round(Math.random() * 5000) + 1;
-		this.stopProfit = Math.random();
-		this.stopLoss = Math.random();
+		this.f = Math.round(Math.random() * 60) + 1;
+		this.s = this.f + Math.round(Math.random() * 180) + 1;
+		//this.f = 20;
+		//this.s = 180;
+
+		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
+		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
+
+		this.stopProfit = Math.random() * 0.05;
+		this.stopLoss = Math.random() * 0.05;
+		this.minPriceVolume = Math.random() * 100_000_000_000;
 	}
 }

@@ -1,4 +1,4 @@
-import {AlpacaApi} from "./alpacaApi";
+import {AlpacaApi, TimeFrame} from "./alpacaApi";
 
 export interface Listing {
 	asset: Asset
@@ -17,12 +17,12 @@ export class Market {
 		//console.table(assets, ['class', 'exchange', 'symbol', 'name'])
 
 		// first only nvidia
-		const nvda = assets.find(e => e.symbol === 'NVDA');
+		const nvda = assets.find(e => e.symbol === 'QQQ');
 
 
 		this.listings[nvda.symbol] = {
 			asset: nvda,
-			priceActions: await this.api.getPriceAction(nvda.symbol)
+			priceActions: await this.api.getPriceAction(nvda.symbol, TimeFrame.M5)
 		}
 	}
 }

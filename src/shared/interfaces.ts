@@ -29,6 +29,7 @@ export interface CandleSeries {
 }
 
 export interface ChartSeries {
+	id: string
 	areas?:ValueSeries[]
 	lines?: ValueSeries[]
 	candles?: CandleSeries[]

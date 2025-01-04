@@ -1,5 +1,5 @@
 import {Time} from "lightweight-charts";
-import {Candle} from "./shared/interfaces";
+import {Candle, ChartSeries} from "./shared/interfaces";
 
 
 
@@ -95,7 +95,7 @@ export class Api {
 		} as MessageEvent)
 	}
 
-	async getSymbol(symbol: string) {
-		return await (await fetch('api/result')).json();
+	async getCharts(): Promise<ChartSeries[]> {
+		return await (await fetch('api/charts')).json();
 	}
 }

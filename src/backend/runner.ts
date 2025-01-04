@@ -1,6 +1,7 @@
 import {Market} from "./market";
 import {Broker} from "./broker";
 import {MovingAverage} from "./strategy/moving-average";
+import {sum} from "@tensorflow/tfjs";
 
 export class Runner {
 	broker: Broker
@@ -25,7 +26,7 @@ export class Runner {
 		let epoch = 0;
 
 		do {
-			for (let i = 0; i < 1000; ++i) {
+			for (let i = 0; i < 10; ++i) {
 				let index = 0;
 				this.strategy.tune();
 
@@ -37,35 +38,42 @@ export class Runner {
 				this.strategy.finish();
 				if (this.broker.transactions >= 4) {
 					// ignore buy and hold results
-					if (this.broker.cash > 100) {
-						// only the ones who make profit
-						results.push({
-							symbol: this.symbol,
-							//rating: (this.broker.cash - 100) / (this.broker.transactions / 2),
-							rating: (this.broker.cash - 100),
-							cash: `${this.broker.cash.toLocaleString('de',{maximumFractionDigits: 2})}`,
-							tx: this.broker.transactions,
-							fast: this.strategy.f,
-							slow: this.strategy.s,
-							stopProfit: this.strategy.stopProfit.toFixed(4),
-							stopLoss: this.strategy.stopLoss.toFixed(4)
-						});
-					}
+					//if (this.broker.cash > 100) {
+					// only the ones who make profit
+					results.push({
+						symbol: this.symbol,
+						rating: (this.broker.cash - 100) / (this.broker.transactions / 2),
+						//rating: (this.broker.cash - 100),
+						cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
+						tx: this.broker.transactions,
+						fast: this.strategy.f,
+						slow: this.strategy.s,
+						stopProfit: this.strategy.stopProfit,
+						stopLoss: this.strategy.stopLoss,
+						volume: this.strategy.minPriceVolume
+					});
+					//}
 				}
 
 				this.strategy.reset();
 			}
 
-			results.sort((a,b) => (b.rating - a.rating ))
-			results.length = Math.min(8, results.length);
+			results.sort((a, b) => (b.rating - a.rating))
+			results.length = Math.min(10, results.length);
 
-			hasImproved = max < results.at(-1).rating;
-			max = Math.max(max, results.at(-1).rating);
+			let sum = 0;
+			for (let x of results) {
+				sum += x.rating;
+			}
+
+			hasImproved = max < sum;
+			max = Math.max(max, sum);
 
 			console.clear();
 			console.log(`epoch ${epoch++}`)
-			console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'rating']);
-		} while (hasImproved);
+			console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'rating', 'volume']);
+			//} while (hasImproved || max <= 0);
+		}while (hasImproved || max <= 0);
 
 
 		console.log("Done")
@@ -73,7 +81,10 @@ export class Runner {
 		// restart the best setup
 		this.strategy.s = results[0].slow;
 		this.strategy.f = results[0].fast;
-		this.strategy.stopLoss = results[0].stop;
+		this.strategy.stopLoss = results[0].stopLoss;
+		this.strategy.stopProfit = results[0].stopProfit;
+		this.strategy.minPriceVolume = results[0].volume;
+
 		// this.strategy.s = 48;
 		// this.strategy.m = 98;
 		// this.strategy.trailingPStopProfit = 0.006;

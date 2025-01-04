@@ -1,4 +1,5 @@
 import {Market} from "./market";
+import {TimeValue} from "../shared/interfaces";
 
 export class Broker {
 
@@ -7,6 +8,7 @@ export class Broker {
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
+	history: TimeValue[] = []
 
 	constructor(private market: Market) {
 
@@ -42,6 +44,10 @@ export class Broker {
 		this.positions[symbol] -= amount;
 
 		this.transactions++;
+		this.history.push({
+			time: this.market.listings[symbol].priceActions[index].t,
+			value: this.cash
+		})
 
 		return true;
 	}
@@ -59,5 +65,6 @@ export class Broker {
 		for (const key in this.positions) {
 			this.positions[key] = 0;
 		}
+		this.history.length = 0;
 	}
 }

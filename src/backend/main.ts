@@ -2,26 +2,25 @@ import {Runner} from "./runner";
 import {ChartSeries} from "../shared/interfaces"
 import {Market} from "./market";
 
-console.log("start")
-
 class Backend {
 
 	market = new Market();
-	runner = new Runner(this.market, 'NVDA');
+	runner = new Runner(this.market, 'QQQ');
 
 	result = () => {
 
-		let charts: ChartSeries = {
+		let charts: ChartSeries[] = [{
+			id: 'QQQ',
 			lines: [{
 				id: 'macd',
-				data: this.runner.strategy.slow,
+				data: this.runner.strategy.slow.slice(-10000),
 				color: "#00FF00",
 				lineWidth: 1,
 				lineStyle: 2,
 				axisLabelVisible: false
 			}, {
 				id: 'signal',
-				data: this.runner.strategy.fast,
+				data: this.runner.strategy.fast.slice(-10000),
 				color: "#FFAA00",
 				lineWidth: 1,
 				lineStyle: 2,
@@ -29,16 +28,32 @@ class Backend {
 			}],
 			candles: [{
 				id: 'stock',
-				data: this.runner.strategy.stock
+				data: this.runner.strategy.stock.slice(-10000)
 			}],
-			markers: this.runner.strategy.marker
-		}
+			markers: this.runner.strategy.marker.slice(-100)
+		}, {
+			id: 'cash',
+			areas: [{
+				id: 'cash',
+				data: this.runner.broker.history
+			}],
+			lines: [{
+				id: 'stock',
+				color: '#FFFFFF',
+				lineWidth: 1,
+				lineStyle: 1,
+				data: this.market.listings.QQQ.priceActions.map(e => ({
+					time: e.t,
+					value: e.vw
+				}))
+			}]
+		}]
 
 		return Response.json(charts);
 	}
 
 	router = {
-		'/api/result': this.result
+		'/api/charts': this.result
 	}
 
 	async main() {
