@@ -18,7 +18,6 @@ export class Api {
 
 		const priceDatas: { [key: string]: Candle[] } = {};
 
-		// {"T":"b","S":"PLTR","o":61.9,"h":61.92,"l":61.88,"c":61.88,"v":821,"t":"2024-11-19T19:41:00Z","n":10,"vw":61.901923}
 		for (const entry of data) {
 			if (entry.T === "b") { // new bar
 				if (!priceDatas[entry.S]) {
@@ -58,7 +57,6 @@ export class Api {
 
 			ws.send(JSON.stringify({
 				action: "subscribe",
-				//bars:["NVDA", "PLTR", "AAPL", "GOOG", "AMZN", "META", "TSLA", "TSM", "AMD"],
 				bars: ["NVDA"],
 			}));
 		};

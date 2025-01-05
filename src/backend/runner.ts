@@ -21,12 +21,12 @@ export class Runner {
 		const nvda = this.market.listings[this.symbol];
 		const results = [];
 
-		let max = 0;
+		let max = Number.MIN_VALUE;
 		let hasImproved = false;
 		let epoch = 0;
 
 		do {
-			for (let i = 0; i < 70; ++i) {
+			for (let i = 0; i < 25; ++i) {
 				let index = 0;
 				this.strategy.tune();
 
@@ -36,21 +36,23 @@ export class Runner {
 				}
 
 				this.strategy.finish();
-				if (this.broker.transactions >= 4) {
+				if (this.broker.transactions >= 1000) {
 					// ignore buy and hold results
 					//if (this.broker.cash > 100) {
 					// only the ones who make profit
 					results.push({
 						symbol: this.symbol,
 						rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
-						//rating: (this.broker.cash - 100),
+						//rating: (this.broker.cash - this.broker.startCash),
 						cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
 						tx: this.broker.transactions,
 						fast: this.strategy.f,
 						slow: this.strategy.s,
 						stopProfit: this.strategy.stopProfit,
 						stopLoss: this.strategy.stopLoss,
-						volume: this.strategy.minPriceVolume
+						volume: this.strategy.minPriceVolume,
+						SM: this.strategy.startM,
+						SH: this.strategy.startH
 					});
 					//}
 				}
@@ -59,7 +61,7 @@ export class Runner {
 			}
 
 			results.sort((a, b) => (b.rating - a.rating))
-			results.length = Math.min(70, results.length);
+			results.length = Math.min(25, results.length);
 
 			let sum = 0;
 			for (let x of results) {
@@ -69,14 +71,29 @@ export class Runner {
 			hasImproved = max < sum;
 			max = Math.max(max, sum);
 
+
+			const formatedResult = results.map(e => ({
+				symbol: e.symbol,
+				rating: e.rating.toFixed(2),
+				cash: e.cash,
+				tx: e.tx.toString(),
+				fast: e.fast.toString(),
+				slow: e.slow.toString(),
+				stopProfit: e.stopProfit.toFixed(3),
+				stopLoss: e.stopLoss.toFixed(3),
+				volume: e.volume,
+				SH: e.SH,
+				SM: e.SM
+			}));
+
 			console.clear();
 			console.log(`epoch ${epoch++}`)
-			console.table(results, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'rating', 'volume']);
-			//} while (hasImproved || max <= 0);
-		}while (hasImproved);
+			console.table(formatedResult, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'SH', 'SM', 'rating']);
+			console.log(hasImproved,max)
+		}while (hasImproved || max < 1);
 
 
-		console.log("Done")
+		console.log("Done", max)
 
 		// restart the best setup
 		this.strategy.s = results[0].slow;
@@ -84,6 +101,8 @@ export class Runner {
 		this.strategy.stopLoss = results[0].stopLoss;
 		this.strategy.stopProfit = results[0].stopProfit;
 		this.strategy.minPriceVolume = results[0].volume;
+		this.strategy.startH = results[0].SH;
+		this.strategy.startM = results[0].SM;
 
 		// this.strategy.s = 48;
 		// this.strategy.m = 98;

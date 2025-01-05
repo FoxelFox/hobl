@@ -42,7 +42,7 @@ class Backend {
 				color: '#FFFFFF',
 				lineWidth: 1,
 				lineStyle: 1,
-				data: this.market.listings.QQQ.priceActions.map(e => ({
+				data: this.market.listings['QQQ'].priceActions.map(e => ({
 					time: e.t,
 					value: e.vw
 				}))
