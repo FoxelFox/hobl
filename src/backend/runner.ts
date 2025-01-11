@@ -18,80 +18,59 @@ export class Runner {
 
 
 	run() {
-		const nvda = this.market.listings[this.symbol];
+		const listing = this.market.listings[this.symbol];
 		const results = [];
 
 		let max = Number.MIN_VALUE;
 		let hasImproved = false;
 		let epoch = 0;
 
+		const samples = 25;
+		const minTX = 1000;
+		const minAvgRating = 5
+
+		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 100000);
+
 		do {
-			for (let i = 0; i < 25; ++i) {
+			for (let i = 0; i < samples; ++i) {
 				let index = 0;
 				this.strategy.tune();
 
-				for (const priceAction of nvda.priceActions) {
+				for (const priceAction of trainPriceActions) {
 					this.strategy.tick(index, priceAction);
 					index++;
 				}
 
-				this.strategy.finish();
-				if (this.broker.transactions >= 1000) {
-					// ignore buy and hold results
-					//if (this.broker.cash > 100) {
-					// only the ones who make profit
-					results.push({
-						symbol: this.symbol,
-						rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
-						//rating: (this.broker.cash - this.broker.startCash),
-						cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
-						tx: this.broker.transactions,
-						fast: this.strategy.f,
-						slow: this.strategy.s,
-						stopProfit: this.strategy.stopProfit,
-						stopLoss: this.strategy.stopLoss,
-						volume: this.strategy.minPriceVolume,
-						SM: this.strategy.startM,
-						SH: this.strategy.startH
-					});
-					//}
+				this.strategy.finish(index -1);
+				if (this.broker.transactions >= minTX) {
+					results.push(this.generateResultReport());
 				}
 
 				this.strategy.reset();
 			}
 
 			results.sort((a, b) => (b.rating - a.rating))
-			results.length = Math.min(25, results.length);
+			results.length = Math.min(samples, results.length);
 
-			let sum = 0;
-			for (let x of results) {
-				sum += x.rating;
+
+			if (results.length > 0) {
+				let sum = 0;
+				for (let x of results) {
+					sum += x.rating;
+				}
+
+				const avg = sum / results.length
+				hasImproved = max < avg;
+				max = Math.max(max, avg);
 			}
 
-			hasImproved = max < sum;
-			max = Math.max(max, sum);
-
-
-			const formatedResult = results.map(e => ({
-				symbol: e.symbol,
-				rating: e.rating.toFixed(2),
-				cash: e.cash,
-				tx: e.tx.toString(),
-				fast: e.fast.toString(),
-				slow: e.slow.toString(),
-				stopProfit: e.stopProfit.toFixed(3),
-				stopLoss: e.stopLoss.toFixed(3),
-				volume: e.volume,
-				SH: e.SH,
-				SM: e.SM
-			}));
+			epoch++;
 
 			console.clear();
-			console.log(`epoch ${epoch++}`)
-			console.table(formatedResult, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'SH', 'SM', 'rating']);
-			console.log(hasImproved,max)
-		}while (hasImproved || max < 1);
+			this.logTable(results, epoch);
 
+			console.log(hasImproved, max < minAvgRating,results.length === 0,isNaN(max))
+		}while (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max));
 
 		console.log("Done", max)
 
@@ -104,14 +83,49 @@ export class Runner {
 		this.strategy.startH = results[0].SH;
 		this.strategy.startM = results[0].SM;
 
-		// this.strategy.s = 48;
-		// this.strategy.m = 98;
-		// this.strategy.trailingPStopProfit = 0.006;
-
 		let index = 0;
-		for (const priceAction of nvda.priceActions) {
+		for (const priceAction of listing.priceActions) {
 			this.strategy.tick(index, priceAction);
 			index++;
+		}
+		this.strategy.finish(index -1);
+
+		this.logTable([this.generateResultReport()]);
+	}
+
+	logTable(results, epoch?: number) {
+		const formatedResult = results.map(e => ({
+			symbol: e.symbol,
+			rating: e.rating.toFixed(2),
+			cash: e.cash,
+			tx: e.tx.toString(),
+			fast: e.fast.toString(),
+			slow: e.slow.toString(),
+			stopProfit: e.stopProfit.toFixed(3),
+			stopLoss: e.stopLoss.toFixed(3),
+			volume: e.volume,
+			SH: e.SH,
+			SM: e.SM
+		}));
+
+		epoch ? console.log(`epoch ${epoch}`): 42
+		console.table(formatedResult, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'SH', 'SM', 'rating']);
+	}
+
+	generateResultReport() {
+		return {
+			symbol: this.symbol,
+				rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
+			//rating: (this.broker.cash - this.broker.startCash),
+			cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
+			tx: this.broker.transactions,
+			fast: this.strategy.f,
+			slow: this.strategy.s,
+			stopProfit: this.strategy.stopProfit,
+			stopLoss: this.strategy.stopLoss,
+			volume: this.strategy.minPriceVolume,
+			SM: this.strategy.startM,
+			SH: this.strategy.startH
 		}
 	}
 }

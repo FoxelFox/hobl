@@ -10,8 +10,8 @@ export abstract class Strategy {
 
 	abstract tune()
 
-	finish() {
-		this.broker.sellAllPositions();
+	finish(index: number) {
+		this.broker.sellAllPositions(index);
 	}
 
 	reset() {

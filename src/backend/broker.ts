@@ -3,13 +3,13 @@ import {TimeValue} from "../shared/interfaces";
 
 export class Broker {
 
-	readonly startCash = 2000;
+	readonly startCash = 1000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
-	leverage: number = 3;
+	leverage: number = 10;
 	txCost: number = 1;
 	lastCashUsed: number;
 
@@ -24,11 +24,12 @@ export class Broker {
 		}
 
 		const price = this.market.listings[symbol].priceActions[index].vw;
-		const shares = (amount - this.txCost) / price;
+		const shares = amount / price;
 
 		this.lastCashUsed = amount;
 		this.positions[symbol] ??= 0;
 		this.cash -= amount;
+		this.cash -= this.txCost;
 		this.positions[symbol] += shares;
 
 		this.transactions++;
@@ -49,13 +50,14 @@ export class Broker {
 
 		const price = this.market.listings[symbol].priceActions[index].vw;
 
-		const fiat = amount * price - this.txCost;
+		const fiat = amount * price;
 
 		let performance: number
 
 		if (this.lastCashUsed) {
 			performance = this.lastCashUsed + (fiat - this.lastCashUsed) * this.leverage;
 			this.cash += performance;
+			this.cash -= this.txCost;
 		} else {
 			console.log("ERROR", amount)
 			this.cash += fiat;
@@ -82,9 +84,8 @@ export class Broker {
 		return true;
 	}
 
-	sellAllPositions() {
+	sellAllPositions(index: number) {
 		for (const key in this.positions) {
-			const index = this.market.listings[key].priceActions.length -1;
 			this.sell(index, key, this.positions[key]);
 		}
 	}

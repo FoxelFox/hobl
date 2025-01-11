@@ -55,8 +55,8 @@ export class MovingAverage extends Strategy {
 			return
 		}
 
-		this.min = Math.min(this.min, priceAction.vw);
-		this.max = Math.max(this.max, priceAction.vw);
+		this.min = Math.min(this.min, priceAction.l);
+		this.max = Math.max(this.max, priceAction.h);
 
 		let fast = 0;
 		for (let i = this.stock.length - this.f, l = this.stock.length; i < l; ++i) {
@@ -118,7 +118,7 @@ export class MovingAverage extends Strategy {
 			})
 
 
-			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.startCash * 0.5))) {
+			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash * 0.5))) {
 				// buy failed
 			}
 
@@ -143,8 +143,8 @@ export class MovingAverage extends Strategy {
 		this.buyNow = false;
 	}
 
-	finish() {
-		super.finish();
+	finish(index: number) {
+		super.finish(index);
 		this.isLong = false;
 		this.isInvested = false;
 	}
@@ -157,6 +157,7 @@ export class MovingAverage extends Strategy {
 		this.slow.length = 0;
 		this.stock.length = 0;
 		this.marker.length = 0;
+		this.lastTradedDay = undefined;
 		this.resetStopLoss();
 	}
 
@@ -167,25 +168,25 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 16) + 1;
-		this.s = this.f + Math.round(Math.random() * 32) + 1;
+		this.f = Math.round(Math.random() * 150) + 1;
+		this.s = this.f + Math.round(Math.random() * 150) + 1;
 
 		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		this.startH = Math.round(Math.random()* 20)
 		this.startM = Math.round(Math.random()* 55)
-		this.stopProfit = Math.random() * 0.02;
-		this.stopLoss = Math.random() * 0.45;
+		this.stopProfit = Math.random() * 0.1;
+		this.stopLoss = Math.random() * 0.5;
 		this.minPriceVolume = Math.random() * 100_000_000_000;
 
 		// fix
-		this.s = 25 + Math.round(Math.random() * 2 - 1) * 4;
-		this.f = 10 + Math.round(Math.random() * 2 - 1) * 4;
+		//this.s = 220 + Math.round(Math.random() * 2 - 1) * 10;
+		//this.f = 100 + Math.round(Math.random() * 2 - 1) * 10;
 
-		this.stopLoss = 0.5
-		this.stopProfit = 0.01
+		//this.stopLoss = 0.200 + (Math.random() * 2 - 1) * 0.01
+		//this.stopProfit = 0.01 + (Math.random() * 2 - 1) * 0.01
 
 		//this.startH = 13;
-		//this.startM = 37;
+		//this.startM = 52;
 	}
 }
