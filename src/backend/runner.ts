@@ -27,7 +27,7 @@ export class Runner {
 
 		const samples = 25;
 		const minTX = 1000;
-		const minAvgRating = 5
+		const minAvgRating = 42
 
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 100000);
 

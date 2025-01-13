@@ -180,8 +180,8 @@ export class MovingAverage extends Strategy {
 		this.minPriceVolume = Math.random() * 100_000_000_000;
 
 		// fix
-		//this.s = 220 + Math.round(Math.random() * 2 - 1) * 10;
-		//this.f = 100 + Math.round(Math.random() * 2 - 1) * 10;
+		this.s = 4 + Math.round(Math.random() * 2 - 1) * 10;
+		this.f = 3 + Math.round(Math.random() * 2 - 1) * 2;
 
 		//this.stopLoss = 0.200 + (Math.random() * 2 - 1) * 0.01
 		//this.stopProfit = 0.01 + (Math.random() * 2 - 1) * 0.01
