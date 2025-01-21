@@ -22,7 +22,7 @@ export class Market {
 
 		this.listings[nvda.symbol] = {
 			asset: nvda,
-			priceActions: await this.api.getPriceAction(nvda.symbol, TimeFrame.M5)
+			priceActions: await this.api.getPriceAction(nvda.symbol, TimeFrame.M1)
 		}
 	}
 }

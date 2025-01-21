@@ -13,14 +13,14 @@ class Backend {
 			id: 'QQQ',
 			lines: [{
 				id: 'macd',
-				data: this.runner.strategy.slow.slice(-10000),
+				data: this.runner.strategy.slow.slice(-100000),
 				color: "#00FF00",
 				lineWidth: 1,
 				lineStyle: 2,
 				axisLabelVisible: false
 			}, {
 				id: 'signal',
-				data: this.runner.strategy.fast.slice(-10000),
+				data: this.runner.strategy.fast.slice(-100000),
 				color: "#FFAA00",
 				lineWidth: 1,
 				lineStyle: 2,
@@ -28,7 +28,7 @@ class Backend {
 			}],
 			candles: [{
 				id: 'stock',
-				data: this.runner.strategy.stock.slice(-10000)
+				data: this.runner.strategy.stock.slice(-100000)
 			}],
 			markers: this.runner.strategy.marker.slice(-100)
 		}, {

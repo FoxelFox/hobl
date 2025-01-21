@@ -25,11 +25,12 @@ export class Runner {
 		let hasImproved = false;
 		let epoch = 0;
 
-		const samples = 25;
+		const samples = 3;
 		const minTX = 1000;
-		const minAvgRating = 42
+		const minAvgRating = 12000
+		const minGain = 0;
 
-		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 100000);
+		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
 
 		do {
 			for (let i = 0; i < samples; ++i) {
@@ -43,7 +44,9 @@ export class Runner {
 
 				this.strategy.finish(index -1);
 				if (this.broker.transactions >= minTX) {
-					results.push(this.generateResultReport());
+					if (this.broker.cash > this.broker.startCash * minGain) {
+						results.push(this.generateResultReport());
+					}
 				}
 
 				this.strategy.reset();
@@ -79,6 +82,7 @@ export class Runner {
 		this.strategy.f = results[0].fast;
 		this.strategy.stopLoss = results[0].stopLoss;
 		this.strategy.stopProfit = results[0].stopProfit;
+		this.strategy.limitProfit = results[0].limitProfit;
 		this.strategy.minPriceVolume = results[0].volume;
 		this.strategy.startH = results[0].SH;
 		this.strategy.startM = results[0].SM;
@@ -103,29 +107,35 @@ export class Runner {
 			slow: e.slow.toString(),
 			stopProfit: e.stopProfit.toFixed(3),
 			stopLoss: e.stopLoss.toFixed(3),
+			limitProfit: e.limitProfit.toFixed(3),
 			volume: e.volume,
 			SH: e.SH,
-			SM: e.SM
+			SM: e.SM,
+			win: Math.round(e.win * 100)
 		}));
 
 		epoch ? console.log(`epoch ${epoch}`): 42
-		console.table(formatedResult, ['symbol', 'cash', 'tx', 'slow', 'fast', 'stopLoss', 'stopProfit', 'SH', 'SM', 'rating']);
+		console.table(formatedResult);
 	}
 
 	generateResultReport() {
 		return {
 			symbol: this.symbol,
-				rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
+			//rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
 			//rating: (this.broker.cash - this.broker.startCash),
+			rating: this.broker.winRate * this.broker.cash,
+			//rating: this.broker.winRate,
 			cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
 			tx: this.broker.transactions,
 			fast: this.strategy.f,
 			slow: this.strategy.s,
 			stopProfit: this.strategy.stopProfit,
 			stopLoss: this.strategy.stopLoss,
+			limitProfit: this.strategy.limitProfit,
 			volume: this.strategy.minPriceVolume,
 			SM: this.strategy.startM,
-			SH: this.strategy.startH
+			SH: this.strategy.startH,
+			win: this.broker.winRate
 		}
 	}
 }

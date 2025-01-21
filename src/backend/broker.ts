@@ -3,15 +3,17 @@ import {TimeValue} from "../shared/interfaces";
 
 export class Broker {
 
-	readonly startCash = 1000;
+	readonly startCash = 10000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
-	leverage: number = 10;
+	leverage: number = 50;
 	txCost: number = 1;
 	lastCashUsed: number;
+	win: number = 0;
+	loose: number = 0;
 
 	constructor(private market: Market) {
 
@@ -52,12 +54,15 @@ export class Broker {
 
 		const fiat = amount * price;
 
-		let performance: number
-
 		if (this.lastCashUsed) {
-			performance = this.lastCashUsed + (fiat - this.lastCashUsed) * this.leverage;
+			const performance = this.lastCashUsed + (fiat - this.lastCashUsed) * this.leverage;
 			this.cash += performance;
 			this.cash -= this.txCost;
+			if (this.lastCashUsed < performance) {
+				this.win++;
+			} else {
+				this.loose++;
+			}
 		} else {
 			console.log("ERROR", amount)
 			this.cash += fiat;
@@ -92,11 +97,17 @@ export class Broker {
 
 	reset() {
 		this.cash = this.startCash;
+		this.win = 0;
+		this.loose = 0;
 		this.transactions = 0;
 		this.lastCashUsed = undefined;
 		for (const key in this.positions) {
 			this.positions[key] = 0;
 		}
 		this.history.length = 0;
+	}
+
+	get winRate() {
+		return this.win / (this.win + this.loose);
 	}
 }
