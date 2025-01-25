@@ -3,13 +3,13 @@ import {TimeValue} from "../shared/interfaces";
 
 export class Broker {
 
-	readonly startCash = 10000;
+	readonly startCash = 1000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
-	leverage: number = 50;
+	leverage: number = 3;
 	txCost: number = 1;
 	lastCashUsed: number;
 	win: number = 0;
@@ -39,7 +39,6 @@ export class Broker {
 		if (this.cash < 0 || this.positions[symbol] < 0) {
 			console.log('error buy', this.cash)
 		}
-
 
 		return true;
 	}

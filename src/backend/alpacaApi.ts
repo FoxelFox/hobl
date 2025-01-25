@@ -33,6 +33,15 @@ export class AlpacaApi {
 			date = new Date(Date.now() - 1000 * 60 * 60 * 24 * 365 * 10).toISOString().split('T')[0];
 		}
 
+		bars = bars.concat(await this.getPriceActionByDate(symbol, timeframe, date));
+
+		await this.saveToStorage(symbol, timeframe, bars);
+		return bars
+	}
+
+	async getPriceActionByDate(symbol: string, timeframe: TimeFrame, date: string): Promise<RawPriceAction[]> {
+		let bars = [];
+
 		const url = [
 			`https://data.alpaca.markets/v2/stocks/bars?symbols=${symbol}`,
 			`timeframe=${timeframe}`,
@@ -59,17 +68,11 @@ export class AlpacaApi {
 					})
 				})).json();
 			bars = bars.concat(res.bars[symbol]);
-			console.log('fetched', res.next_page_token);
+			if (res.next_page_token) {
+				console.log('next request', res.next_page_token);
+			}
 		} while (res.next_page_token);
 
-		await this.saveToStorage(symbol, timeframe, bars);
-
-
-
-		// return bars.filter(e => {
-		// 	const date = new Date(e.t);
-		// 	return (date.getUTCHours() > 14 || date.getUTCHours() === 14 && date.getUTCMinutes() > 30 ) && date.getUTCHours() < 21;
-		// });
 		return bars
 	}
 

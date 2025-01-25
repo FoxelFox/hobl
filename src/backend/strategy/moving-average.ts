@@ -2,6 +2,8 @@ import {Strategy} from "./strategy";
 import {Broker} from "../broker";
 import {Candle, CandleSeries, TimeValue} from "../../shared/interfaces";
 import {SeriesMarker, Time} from "lightweight-charts";
+import {EventSystem} from "../../shared/event-system";
+import {inject} from "../../shared/injector";
 
 
 export class MovingAverage extends Strategy {
@@ -31,10 +33,16 @@ export class MovingAverage extends Strategy {
 	startH: number;
 	startM: number;
 
+	eventSystem = inject(EventSystem);
+
 	constructor(private symbol: string, broker: Broker) {
 		super(broker);
-	}
 
+		this.eventSystem.register(symbol, (data: {index: number, priceAction: RawPriceAction}) => {
+			console.log("Event Update", data.index, data.priceAction.vw);
+			this.tick(data.index, data.priceAction);
+		});
+	}
 
 	tick(index: number, priceAction: RawPriceAction) {
 
@@ -119,7 +127,7 @@ export class MovingAverage extends Strategy {
 			})
 
 
-			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.startCash*0.1))) {
+			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.startCash*0.5))) {
 				// buy failed
 			}
 
@@ -177,7 +185,7 @@ export class MovingAverage extends Strategy {
 		this.startM = Math.round(Math.random()* 55)
 		this.stopProfit = Math.random() * 0.02;
 		this.stopLoss = Math.random() * 0.3;
-		this.limitProfit = Math.random() * 20;
+		this.limitProfit = Math.random() * 50;
 		this.minPriceVolume = Math.random() * 100_000_000_000;
 
 		// fix

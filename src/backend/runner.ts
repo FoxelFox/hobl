@@ -2,10 +2,13 @@ import {Market} from "./market";
 import {Broker} from "./broker";
 import {MovingAverage} from "./strategy/moving-average";
 import {sum} from "@tensorflow/tfjs";
+import {EventSystem} from "../shared/event-system";
+import {inject} from "../shared/injector";
 
 export class Runner {
 	broker: Broker
 	strategy: MovingAverage
+	eventSystem = inject(EventSystem);
 
 	constructor(private market: Market, private symbol: string) {
 		this.broker = new Broker(this.market);
@@ -17,7 +20,7 @@ export class Runner {
 	}
 
 
-	run() {
+	train() {
 		const listing = this.market.listings[this.symbol];
 		const results = [];
 
@@ -27,7 +30,7 @@ export class Runner {
 
 		const samples = 3;
 		const minTX = 1000;
-		const minAvgRating = 12000
+		const minAvgRating = 1600
 		const minGain = 0;
 
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
@@ -92,9 +95,6 @@ export class Runner {
 			this.strategy.tick(index, priceAction);
 			index++;
 		}
-		this.strategy.finish(index -1);
-
-		this.logTable([this.generateResultReport()]);
 	}
 
 	logTable(results, epoch?: number) {

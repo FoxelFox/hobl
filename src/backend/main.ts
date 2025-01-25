@@ -1,9 +1,12 @@
 import {Runner} from "./runner";
 import {ChartSeries} from "../shared/interfaces"
 import {Market} from "./market";
+import {EventSystem} from "../shared/event-system";
+import {data} from "@tensorflow/tfjs";
 
 class Backend {
 
+	eventSystem = new EventSystem();
 	market = new Market();
 	runner = new Runner(this.market, 'QQQ');
 
@@ -58,7 +61,8 @@ class Backend {
 
 	async main() {
 		await this.runner.init();
-		this.runner.run();
+		this.runner.train();
+		this.market.watch();
 	}
 }
 
@@ -92,4 +96,6 @@ backed.main().then(() => {
 
 		},
 	});
+
+	console.log("Test")
 });
