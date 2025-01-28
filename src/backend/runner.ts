@@ -28,11 +28,11 @@ export class Runner {
 		let hasImproved = false;
 		let epoch = 0;
 
-		const samples = 3;
+		const samples = 1;
 		const minTX = 1000;
 		const minAvgRating = 1600
 		const minGain = 0;
-
+		const skipTraining = true;
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
 
 		do {
@@ -46,11 +46,11 @@ export class Runner {
 				}
 
 				this.strategy.finish(index -1);
-				if (this.broker.transactions >= minTX) {
-					if (this.broker.cash > this.broker.startCash * minGain) {
+				//if (this.broker.transactions >= minTX) {
+				// 	if (this.broker.cash > this.broker.startCash * minGain) {
 						results.push(this.generateResultReport());
-					}
-				}
+					// }
+				// }
 
 				this.strategy.reset();
 			}
@@ -76,7 +76,7 @@ export class Runner {
 			this.logTable(results, epoch);
 
 			console.log(hasImproved, max < minAvgRating,results.length === 0,isNaN(max))
-		}while (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max));
+		}while (!skipTraining && (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max)));
 
 		console.log("Done", max)
 

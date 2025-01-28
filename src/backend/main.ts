@@ -3,17 +3,21 @@ import {ChartSeries} from "../shared/interfaces"
 import {Market} from "./market";
 import {EventSystem} from "../shared/event-system";
 import {data} from "@tensorflow/tfjs";
+import * as Buffer from "node:buffer";
+import {inject} from "../shared/injector";
+
+
+const SYMBOL = 'QQQ'
 
 class Backend {
 
 	eventSystem = new EventSystem();
 	market = new Market();
-	runner = new Runner(this.market, 'QQQ');
+	runner = new Runner(this.market, SYMBOL);
 
 	result = () => {
-
 		let charts: ChartSeries[] = [{
-			id: 'QQQ',
+			id: SYMBOL,
 			lines: [{
 				id: 'macd',
 				data: this.runner.strategy.slow.slice(-100000),
@@ -45,7 +49,7 @@ class Backend {
 				color: '#FFFFFF',
 				lineWidth: 1,
 				lineStyle: 1,
-				data: this.market.listings['QQQ'].priceActions.map(e => ({
+				data: this.market.listings[SYMBOL].priceActions.map(e => ({
 					time: e.t,
 					value: e.vw
 				}))
@@ -53,16 +57,20 @@ class Backend {
 		}]
 
 		return Response.json(charts);
-	}
+	};
+
+	websocket = () => {
+
+	};
 
 	router = {
-		'/api/charts': this.result
+		'/api/charts': this.result,
+		'/websocket': this.websocket
 	}
 
 	async main() {
 		await this.runner.init();
 		this.runner.train();
-		this.market.watch();
 	}
 }
 
@@ -97,5 +105,35 @@ backed.main().then(() => {
 		},
 	});
 
-	console.log("Test")
+	const webSocketServer = Bun.serve({
+		port: 3001,
+		async fetch(req, server) {
+			// upgrade the request to a WebSocket
+			if (server.upgrade(req)) {
+				return; // do not return a Response
+			}
+			return new Response("Upgrade failed", { status: 500 });
+		},
+		websocket: {
+			open(ws) {
+				ws.subscribe('chart-update');
+			},
+			message(ws, message) {
+
+			},
+			close(ws, code: number, reason: string) {
+				ws.unsubscribe('chart-update');
+			}
+		}
+	});
+
+	const eventSystem = inject(EventSystem);
+
+	eventSystem.register("chart-update", (data) => {
+		webSocketServer.publish("chart-update", JSON.stringify(data));
+	});
+
+	backed.market.watch();
+
+	console.log("Online")
 });

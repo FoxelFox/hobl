@@ -2,6 +2,7 @@ import {Api} from "./api";
 import {Chart} from "./chart";
 import {LstmModel} from "./lstm-model";
 import {ChartSeries, TimeValue} from "./shared/interfaces";
+import {data} from "@tensorflow/tfjs";
 
 export class ChartList {
 
@@ -18,6 +19,18 @@ export class ChartList {
 		for (const chart of charts) {
 			await this.createChart(chart);
 		}
+
+		const socket = new WebSocket(`ws://${location.hostname}:3001`);
+
+		socket.addEventListener("message", event => {
+			const update: ChartSeries[] = JSON.parse(event.data);
+
+			for (const chart of update) {
+				this.charts[chart.id].update(chart);
+			}
+
+
+		});
 	}
 
 	async createChart(data: ChartSeries) {

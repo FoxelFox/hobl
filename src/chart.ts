@@ -73,6 +73,13 @@ export class Chart {
 				for (const entry of series.data) {
 					this.candlestickSeries[series.id].update(entry);
 				}
+
+				if (data.markers){
+					const markers = this.candlestickSeries[series.id].markers();
+					markers.push(...data.markers);
+					this.candlestickSeries[series.id].setMarkers(markers);
+				}
+
 			}
 		}
 
