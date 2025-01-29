@@ -13,6 +13,7 @@ class Backend {
 
 	eventSystem = new EventSystem();
 	market = new Market();
+
 	runner = new Runner(this.market, SYMBOL);
 
 	result = () => {

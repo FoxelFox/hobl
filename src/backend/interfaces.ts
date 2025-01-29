@@ -1,4 +1,4 @@
-interface Asset {
+export interface Asset {
 	id: string
 	class: string
 	exchange: string
@@ -16,7 +16,7 @@ interface Asset {
 	attributes: string[]
 }
 
-interface RawPriceAction {
+export interface RawPriceAction {
 	c: 8.687,
 	h: 9.149,
 	l: 8.641,
@@ -25,4 +25,9 @@ interface RawPriceAction {
 	t: "2020-05-26T04:00:00Z",
 	v: 817377440,
 	vw: 8.817,
+}
+
+export interface RawWebsocketPriceAction extends RawPriceAction{
+	T: "b",
+	S: "QQQ"
 }

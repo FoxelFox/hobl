@@ -1,5 +1,6 @@
-import {string} from "@tensorflow/tfjs";
-import {Time} from "lightweight-charts";
+import {EventSystem} from "../shared/event-system";
+import {inject} from "../shared/injector";
+import {Asset, RawPriceAction, RawWebsocketPriceAction} from "./interfaces";
 
 export enum TimeFrame {
 	M1 = '1Min',
@@ -16,10 +17,40 @@ export class AlpacaApi {
 		secret: string
 	}
 
+	eventSystem = inject(EventSystem);
 
 	async init() {
 		this.auth = await Bun.file("auth.json").json();
+		this.login();
+	}
 
+	login() {
+		const ws = new WebSocket("wss://stream.data.alpaca.markets/v2/iex");
+		ws.onopen = () => {
+			ws.send(JSON.stringify(
+				{"action": "auth", "key": this.auth.key, "secret": this.auth.secret},
+			));
+
+			ws.send(JSON.stringify({
+				action: "subscribe",
+				bars: ["QQQ"],
+			}));
+		};
+
+		ws.onmessage = (message) => {
+			const data: RawWebsocketPriceAction[] = JSON.parse(message.data)
+			for(const entry of data) {
+				this.eventSystem.publish('websocket-price-action', entry);
+			}
+		};
+
+		ws.onerror = (error) => {
+			console.error('WebSocket Error:', error);
+		};
+
+		ws.onclose = () => {
+			console.log('connection closed');
+		};
 	}
 
 	async getPriceAction(symbol: string, timeframe: TimeFrame): Promise<RawPriceAction[]> {

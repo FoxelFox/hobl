@@ -1,6 +1,7 @@
 import {AlpacaApi, TimeFrame} from "./alpacaApi";
 import {EventSystem} from "../shared/event-system";
 import { inject } from "../shared/injector";
+import {Asset, RawPriceAction, RawWebsocketPriceAction} from "./interfaces";
 
 export interface Listing {
 	asset: Asset
@@ -31,23 +32,34 @@ export class Market {
 	}
 
 	watch() {
-		setInterval(async () => {
-			for (const key in this.listings) {
-				const symbol = this.listings[key].asset.symbol;
-				const lastAction = this.listings[symbol].priceActions.at(-1);
-				const update = await this.api.getPriceActionByDate(symbol, this.timeFrame, lastAction.t);
-				const index = update.findIndex(a => a.t === lastAction.t);
-				const newtActions = index === -1 ? [] : update.slice(index + 1);
 
+		// high quality but 15 min delayed data
+		// setInterval(async () => {
+		// 	for (const key in this.listings) {
+		// 		const symbol = this.listings[key].asset.symbol;
+		// 		const lastAction = this.listings[symbol].priceActions.at(-1);
+		// 		const update = await this.api.getPriceActionByDate(symbol, this.timeFrame, lastAction.t);
+		// 		const index = update.findIndex(a => a.t === lastAction.t);
+		// 		const newtActions = index === -1 ? [] : update.slice(index + 1);
+		//
+		//
+		// 		for (const action of newtActions) {
+		// 			this.listings[symbol].priceActions.push(action);
+		// 			this.eventSystem.publish(symbol, {
+		// 				index: this.listings[symbol].priceActions.length -1,
+		// 				priceAction: action
+		// 			});
+		// 		}
+		// 	}
+		// }, 1000);
 
-				for (const action of newtActions) {
-					this.listings[symbol].priceActions.push(action);
-					this.eventSystem.publish(symbol, {
-						index: this.listings[symbol].priceActions.length -1,
-						priceAction: action
-					});
-				}
-			}
-		}, 1000);
+		// cheap but bad quality
+		this.eventSystem.register('websocket-price-action', (e: RawWebsocketPriceAction) => {
+			this.listings[e.S].priceActions.push(e);
+			this.eventSystem.publish(e.S, {
+				index: this.listings[e.S].priceActions.length -1,
+				priceAction: e
+			});
+		})
 	}
 }
