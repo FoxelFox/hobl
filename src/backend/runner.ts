@@ -28,11 +28,11 @@ export class Runner {
 		let hasImproved = false;
 		let epoch = 0;
 
-		const samples = 1;
+		const samples = 5;
 		const minTX = 1000;
-		const minAvgRating = 1600
+		const minAvgRating = 2700
 		const minGain = 0;
-		const skipTraining = true;
+		const skipTraining = false;
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
 
 		do {
@@ -46,11 +46,11 @@ export class Runner {
 				}
 
 				this.strategy.finish(index -1);
-				//if (this.broker.transactions >= minTX) {
+				if (this.broker.transactions >= minTX) {
 				// 	if (this.broker.cash > this.broker.startCash * minGain) {
 						results.push(this.generateResultReport());
 					// }
-				// }
+				}
 
 				this.strategy.reset();
 			}
@@ -85,16 +85,15 @@ export class Runner {
 		this.strategy.f = results[0].fast;
 		this.strategy.stopLoss = results[0].stopLoss;
 		this.strategy.stopProfit = results[0].stopProfit;
-		this.strategy.limitProfit = results[0].limitProfit;
 		this.strategy.minPriceVolume = results[0].volume;
 		this.strategy.startH = results[0].SH;
 		this.strategy.startM = results[0].SM;
 
-		let index = 0;
-		for (const priceAction of listing.priceActions) {
-			this.strategy.tick(index, priceAction);
-			index++;
-		}
+		// let index = 0;
+		// for (const priceAction of listing.priceActions) {
+		// 	this.strategy.tick(index, priceAction);
+		// 	index++;
+		// }
 	}
 
 	logTable(results, epoch?: number) {
@@ -107,7 +106,6 @@ export class Runner {
 			slow: e.slow.toString(),
 			stopProfit: e.stopProfit.toFixed(3),
 			stopLoss: e.stopLoss.toFixed(3),
-			limitProfit: e.limitProfit.toFixed(3),
 			volume: e.volume,
 			SH: e.SH,
 			SM: e.SM,
@@ -131,7 +129,6 @@ export class Runner {
 			slow: this.strategy.s,
 			stopProfit: this.strategy.stopProfit,
 			stopLoss: this.strategy.stopLoss,
-			limitProfit: this.strategy.limitProfit,
 			volume: this.strategy.minPriceVolume,
 			SM: this.strategy.startM,
 			SH: this.strategy.startH,

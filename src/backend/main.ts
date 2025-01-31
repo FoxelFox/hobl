@@ -19,21 +19,40 @@ class Backend {
 	result = () => {
 		let charts: ChartSeries[] = [{
 			id: SYMBOL,
-			lines: [{
-				id: 'macd',
-				data: this.runner.strategy.slow.slice(-100000),
-				color: "#00FF00",
-				lineWidth: 1,
-				lineStyle: 2,
-				axisLabelVisible: false
-			}, {
-				id: 'signal',
-				data: this.runner.strategy.fast.slice(-100000),
-				color: "#FFAA00",
-				lineWidth: 1,
-				lineStyle: 2,
-				axisLabelVisible: false
-			}],
+			lines: [
+				// {
+				// 	id: 'macd',
+				// 	data: this.runner.strategy.slow.slice(-100000),
+				// 	color: "#00FF00",
+				// 	lineWidth: 1,
+				// 	lineStyle: 2,
+				// 	axisLabelVisible: false
+				// },
+				// {
+				// 	id: 'signal',
+				// 	data: this.runner.strategy.fast.slice(-100000),
+				// 	color: "#FFAA00",
+				// 	lineWidth: 1,
+				// 	lineStyle: 2,
+				// 	axisLabelVisible: false
+				// },
+				{
+					id: 'stopLoss',
+					data: this.runner.strategy.stopLossLine.slice(-100000),
+					color: "#AA0000",
+					lineWidth: 2,
+					lineStyle: 1,
+					axisLabelVisible: false
+				},
+				{
+					id: 'stopProfit',
+					data: this.runner.strategy.stopProfitLine.slice(-100000),
+					color: "#00AA00",
+					lineWidth: 2,
+					lineStyle: 1,
+					axisLabelVisible: false
+				}
+			],
 			candles: [{
 				id: 'stock',
 				data: this.runner.strategy.stock.slice(-100000)

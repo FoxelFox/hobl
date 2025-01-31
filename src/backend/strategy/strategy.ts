@@ -1,4 +1,5 @@
 import {Broker} from "../broker";
+import {RawPriceAction} from "../interfaces";
 
 export abstract class Strategy {
 

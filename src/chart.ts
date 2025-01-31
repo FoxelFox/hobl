@@ -49,7 +49,9 @@ export class Chart {
 				this.lineSeries[series.id] = this.chart.addLineSeries({
 					color: series.color,
 					lineWidth: series.lineWidth,
-					lineStyle: series.lineStyle
+					lineStyle: series.lineStyle,
+					lastValueVisible: series.axisLabelVisible,
+					priceLineVisible: series.axisLabelVisible
 				});
 			}
 		}
