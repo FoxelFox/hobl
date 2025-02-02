@@ -21,7 +21,7 @@ export class AlpacaApi {
 
 	async init() {
 		this.auth = await Bun.file("auth.json").json();
-		this.login();
+		//this.login();
 	}
 
 	login() {
@@ -38,9 +38,15 @@ export class AlpacaApi {
 		};
 
 		ws.onmessage = (message) => {
+			console.log(message)
 			const data: RawWebsocketPriceAction[] = JSON.parse(message.data)
-			for(const entry of data) {
-				this.eventSystem.publish('websocket-price-action', entry);
+
+			if (data[0].T === 'b') {
+				for(const entry of data) {
+					this.eventSystem.publish('websocket-price-action', entry);
+				}
+
+				ws.close(); // needed because the api provider stops sending events after few minutes -.-
 			}
 		};
 
@@ -50,6 +56,7 @@ export class AlpacaApi {
 
 		ws.onclose = () => {
 			console.log('connection closed');
+			this.login();
 		};
 	}
 

@@ -1,13 +1,10 @@
 import {Api} from "./api";
 import {Chart} from "./chart";
-import {LstmModel} from "./lstm-model";
-import {ChartSeries, TimeValue} from "./shared/interfaces";
-import {data} from "@tensorflow/tfjs";
+import {ChartSeries} from "./shared/interfaces";
 
 export class ChartList {
 
 	charts: { [key: string]: Chart } = {};
-	models: { [key: string]: LstmModel } = {};
 
 	constructor(private api: Api) {
 		this.debug().then()

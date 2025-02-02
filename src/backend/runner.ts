@@ -29,9 +29,10 @@ export class Runner {
 		let epoch = 0;
 
 		const samples = 5;
-		const minTX = 1000;
-		const minAvgRating = 2700
+		const minTX = 1;
+		const minAvgRating = 1000;
 		const minGain = 0;
+		const maxEpoch = 20;
 		const skipTraining = false;
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
 
@@ -76,11 +77,12 @@ export class Runner {
 			this.logTable(results, epoch);
 
 			console.log(hasImproved, max < minAvgRating,results.length === 0,isNaN(max))
-		}while (!skipTraining && (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max)));
+		}while (!skipTraining && epoch < maxEpoch && (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max)));
 
 		console.log("Done", max)
 
 		// restart the best setup
+		console.log(this.strategy.marker.length)
 		this.strategy.s = results[0].slow;
 		this.strategy.f = results[0].fast;
 		this.strategy.stopLoss = results[0].stopLoss;
@@ -89,11 +91,11 @@ export class Runner {
 		this.strategy.startH = results[0].SH;
 		this.strategy.startM = results[0].SM;
 
-		// let index = 0;
-		// for (const priceAction of listing.priceActions) {
-		// 	this.strategy.tick(index, priceAction);
-		// 	index++;
-		// }
+		let index = 0;
+		for (const priceAction of listing.priceActions) {
+			this.strategy.tick(index, priceAction);
+			index++;
+		}
 	}
 
 	logTable(results, epoch?: number) {
@@ -120,9 +122,10 @@ export class Runner {
 		return {
 			symbol: this.symbol,
 			//rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
-			//rating: (this.broker.cash - this.broker.startCash),
-			rating: this.broker.winRate * this.broker.cash,
+			rating: (this.broker.cash - this.broker.startCash),
+			//rating: this.broker.winRate * this.broker.cash,
 			//rating: this.broker.winRate,
+			//rating: this.broker.winRate * this.broker.cash / this.broker.transactions,
 			cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
 			tx: this.broker.transactions,
 			fast: this.strategy.f,

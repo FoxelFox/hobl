@@ -10,7 +10,7 @@ export interface Listing {
 
 export class Market {
 
-	timeFrame = TimeFrame.M1;
+	timeFrame = TimeFrame.M15;
 	api: AlpacaApi = new AlpacaApi();
 	listings: { [symbol: string]: Listing } = {};
 	eventSystem = inject(EventSystem);
@@ -34,7 +34,7 @@ export class Market {
 	watch() {
 
 		// high quality but 15 min delayed data
-		/*
+
 		setInterval(async () => {
 			for (const key in this.listings) {
 				const symbol = this.listings[key].asset.symbol;
@@ -53,9 +53,9 @@ export class Market {
 				}
 			}
 		}, 1000);
-		*/
-		// cheap but bad quality
 
+		// cheap but bad quality
+		/*
 		this.eventSystem.register('websocket-price-action', (e: RawWebsocketPriceAction) => {
 			this.listings[e.S].priceActions.push(e);
 			this.eventSystem.publish(e.S, {
@@ -63,6 +63,7 @@ export class Market {
 				priceAction: e
 			});
 		});
+		*/
 
 	}
 }

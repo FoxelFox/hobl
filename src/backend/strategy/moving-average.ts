@@ -56,14 +56,14 @@ export class MovingAverage extends Strategy {
 					// 	id: 'signal',
 					// 	data: [this.fast.at(-1)]
 					// },
-					{
-						id: 'stopLoss',
-						data: [this.stopLossLine.at(-1)]
-					},
-					{
-						id: 'stopProfit',
-						data: [this.stopProfitLine.at(-1)]
-					}
+					// {
+					// 	id: 'stopLoss',
+					// 	data: [this.stopLossLine.at(-1)]
+					// },
+					// {
+					// 	id: 'stopProfit',
+					// 	data: [this.stopProfitLine.at(-1)]
+					// }
 				],
 				candles: [{
 					id: 'stock',
@@ -112,7 +112,8 @@ export class MovingAverage extends Strategy {
 
 		const time = new Date(priceAction.t);
 		const day = priceAction.t.split('T')[0];
-		const investedAllowedByTime = (time.getUTCHours() > this.startH || (time.getUTCHours() === this.startH && time.getUTCMinutes() > this.startM)) && (time.getUTCHours() < 20 || (time.getUTCHours() == 20 && time.getUTCMinutes() < 45));
+		let investedAllowedByTime = (time.getUTCHours() > this.startH || (time.getUTCHours() === this.startH && time.getUTCMinutes() > this.startM)) && (time.getUTCHours() < 20 || (time.getUTCHours() == 20 && time.getUTCMinutes() < 45));
+		//investedAllowedByTime = true
 
 		if (this.stock.length < this.s || this.stock.length < this.f ) {
 			return
@@ -150,8 +151,8 @@ export class MovingAverage extends Strategy {
 		const stopLoss = (this.max * (1 - this.stopLoss));
 		const stopProfit = this.buyIn * (1 + this.stopProfit);
 
-		if (this.isInvested && investedAllowedByTime && !this.isLong) {
-			if (priceAction.vw < stopLoss || stopProfit < priceAction.vw) {
+		if (this.isInvested && investedAllowedByTime) {
+			if (priceAction.vw < stopLoss || stopProfit < priceAction.vw || !this.isLong) {
 				this.marker.push({
 					time: priceActionTime,
 					color: '#FF0000',
@@ -239,25 +240,25 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 32) + 1;
-		this.s = this.f + Math.round(Math.random() * 32) + 1;
+		this.f = Math.round(Math.random() * 24 * 10) + 1;
+		this.s = this.f + Math.round(Math.random() * 24 * 20) + 1;
 
 		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		this.startH = 10 + Math.round(Math.random()* 10)
 		this.startM = Math.round(Math.random()* 55)
-		this.stopProfit = Math.random() * 0.002;
-		this.stopLoss = Math.random() * 0.01;
+		this.stopProfit = Math.random() * 100;
+		this.stopLoss = Math.random() * 1;
 		this.minPriceVolume = Math.random() * 100_000_000_000;
 
 		// fix
-		//this.f = 23;
-		//this.s = 40;
+		//this.f = 1;
+		//this.s = 45;
 
 		//this.stopLoss = 0.011;
 		//this.stopProfit = 0.004;
 
-		this.startH = 14;
-		this.startM = 30;
+		//this.startH = 14;
+		//this.startM = 30;
 	}
 }

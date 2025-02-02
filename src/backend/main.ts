@@ -5,6 +5,7 @@ import {EventSystem} from "../shared/event-system";
 import {data} from "@tensorflow/tfjs";
 import * as Buffer from "node:buffer";
 import {inject} from "../shared/injector";
+import {Time} from "lightweight-charts";
 
 
 const SYMBOL = 'QQQ'
@@ -36,22 +37,22 @@ class Backend {
 				// 	lineStyle: 2,
 				// 	axisLabelVisible: false
 				// },
-				{
-					id: 'stopLoss',
-					data: this.runner.strategy.stopLossLine.slice(-100000),
-					color: "#AA0000",
-					lineWidth: 2,
-					lineStyle: 1,
-					axisLabelVisible: false
-				},
-				{
-					id: 'stopProfit',
-					data: this.runner.strategy.stopProfitLine.slice(-100000),
-					color: "#00AA00",
-					lineWidth: 2,
-					lineStyle: 1,
-					axisLabelVisible: false
-				}
+				// {
+				// 	id: 'stopLoss',
+				// 	data: this.runner.strategy.stopLossLine.slice(-100000),
+				// 	color: "#AA0000",
+				// 	lineWidth: 2,
+				// 	lineStyle: 1,
+				// 	axisLabelVisible: false
+				// },
+				// {
+				// 	id: 'stopProfit',
+				// 	data: this.runner.strategy.stopProfitLine.slice(-100000),
+				// 	color: "#00AA00",
+				// 	lineWidth: 2,
+				// 	lineStyle: 1,
+				// 	axisLabelVisible: false
+				// }
 			],
 			candles: [{
 				id: 'stock',
@@ -70,7 +71,7 @@ class Backend {
 				lineWidth: 1,
 				lineStyle: 1,
 				data: this.market.listings[SYMBOL].priceActions.map(e => ({
-					time: e.t,
+					time: (new Date(e.t)).getTime() / 1000 as Time,
 					value: e.vw
 				}))
 			}]

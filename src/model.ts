@@ -26,7 +26,7 @@ export class Model {
 	}
 
 	async load() {
-		const days = await load("NVDA");
+		const days = await load("QQQ");
 		this.pricesPerDay = averagePrices(days);
 	}
 

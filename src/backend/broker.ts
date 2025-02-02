@@ -1,16 +1,17 @@
 import {Market} from "./market";
 import {TimeValue} from "../shared/interfaces";
+import {Time} from "lightweight-charts";
 
 export class Broker {
 
-	readonly startCash = 1000;
+	readonly startCash = 2000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
-	leverage: number = 10;
-	txCost: number = 0;
+	leverage: number = 3;
+	txCost: number = 1;
 	lastCashUsed: number;
 	win: number = 0;
 	loose: number = 0;
@@ -81,7 +82,7 @@ export class Broker {
 
 		this.transactions++;
 		this.history.push({
-			time: this.market.listings[symbol].priceActions[index].t,
+			time:  (new Date(this.market.listings[symbol].priceActions[index].t)).getTime() / 1000 as Time,
 			value: this.cash
 		})
 

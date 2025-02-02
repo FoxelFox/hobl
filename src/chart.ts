@@ -59,10 +59,6 @@ export class Chart {
 		if (data.candles) {
 			for (const series of data.candles) {
 				this.candlestickSeries[series.id] = this.chart.addCandlestickSeries();
-				if (data.markers){
-					this.candlestickSeries[series.id].setMarkers(data.markers);
-				}
-
 			}
 		}
 
