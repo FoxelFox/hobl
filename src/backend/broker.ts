@@ -10,7 +10,7 @@ export class Broker {
 	positions: { [symbol: string]: number } = {};
 	transactions: number = 0;
 	history: TimeValue[] = []
-	leverage: number = 3;
+	leverage: number = 10;
 	txCost: number = 1;
 	lastCashUsed: number;
 	win: number = 0;

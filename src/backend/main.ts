@@ -64,16 +64,6 @@ class Backend {
 			areas: [{
 				id: 'cash',
 				data: this.runner.broker.history
-			}],
-			lines: [{
-				id: 'stock',
-				color: '#FFFFFF',
-				lineWidth: 1,
-				lineStyle: 1,
-				data: this.market.listings[SYMBOL].priceActions.map(e => ({
-					time: (new Date(e.t)).getTime() / 1000 as Time,
-					value: e.vw
-				}))
 			}]
 		}]
 

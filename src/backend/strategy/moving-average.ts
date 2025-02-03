@@ -152,7 +152,7 @@ export class MovingAverage extends Strategy {
 		const stopProfit = this.buyIn * (1 + this.stopProfit);
 
 		if (this.isInvested && investedAllowedByTime) {
-			if (priceAction.vw < stopLoss || stopProfit < priceAction.vw || !this.isLong) {
+			if (priceAction.vw < stopLoss || stopProfit < priceAction.vw) {
 				this.marker.push({
 					time: priceActionTime,
 					color: '#FF0000',
@@ -181,7 +181,7 @@ export class MovingAverage extends Strategy {
 				position: 'belowBar'
 			})
 
-			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.startCash*0.5))) {
+			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash*0.5))) {
 				// buy failed
 			}
 
@@ -247,8 +247,8 @@ export class MovingAverage extends Strategy {
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		this.startH = 10 + Math.round(Math.random()* 10)
 		this.startM = Math.round(Math.random()* 55)
-		this.stopProfit = Math.random() * 100;
-		this.stopLoss = Math.random() * 1;
+		this.stopProfit = Math.random() * 0.1;
+		this.stopLoss = Math.random() * 0.05;
 		this.minPriceVolume = Math.random() * 100_000_000_000;
 
 		// fix

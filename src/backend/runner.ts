@@ -29,8 +29,8 @@ export class Runner {
 		let epoch = 0;
 
 		const samples = 5;
-		const minTX = 1;
-		const minAvgRating = 1000;
+		const minTX = 1000;
+		const minAvgRating = 500000;
 		const minGain = 0;
 		const maxEpoch = 20;
 		const skipTraining = false;

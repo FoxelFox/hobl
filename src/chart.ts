@@ -31,6 +31,7 @@ export class Chart {
 			timeScale: {
 				timeVisible: true,
 				secondsVisible: true,
+				//minBarSpacing: 0.001
 			},
 		});
 
