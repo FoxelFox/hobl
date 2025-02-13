@@ -4,7 +4,7 @@ import {Time} from "lightweight-charts";
 
 export class Broker {
 
-	readonly startCash = 2000;
+	readonly startCash = 1000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
@@ -15,6 +15,7 @@ export class Broker {
 	lastCashUsed: number;
 	win: number = 0;
 	loose: number = 0;
+	delay: number = 15; // delayed data
 
 	constructor(private market: Market) {
 
@@ -22,11 +23,14 @@ export class Broker {
 
 	buy(index: number, symbol: string, amount: number): boolean {
 
+		const priceActions = this.market.listings[symbol].priceActions;
+		const dIndex = Math.min(priceActions.length - 1, index + this.delay);
+
 		if (this.cash < amount + this.txCost || amount < this.txCost) {
 			return false;
 		}
 
-		const price = this.market.listings[symbol].priceActions[index].vw;
+		const price = priceActions[dIndex].vw;
 		const shares = amount / price;
 
 		this.lastCashUsed = amount;
@@ -50,7 +54,9 @@ export class Broker {
 			return false;
 		}
 
-		const price = this.market.listings[symbol].priceActions[index].vw;
+		const priceActions = this.market.listings[symbol].priceActions;
+		const dIndex = Math.min(priceActions.length - 1, index + this.delay);
+		const price = priceActions[dIndex].vw;
 
 		const fiat = amount * price;
 
@@ -58,7 +64,7 @@ export class Broker {
 			const performance = this.lastCashUsed + (fiat - this.lastCashUsed) * this.leverage;
 			this.cash += performance;
 			this.cash -= this.txCost;
-			if (this.lastCashUsed < performance) {
+			if (this.lastCashUsed < (performance - this.txCost * 2)) {
 				this.win++;
 			} else {
 				this.loose++;

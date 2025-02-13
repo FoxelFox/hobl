@@ -135,13 +135,13 @@ export class MovingAverage extends Strategy {
 		slow = slow / this.s;
 
 		if (this.stock.length > 15) {
-			if(slow < fast && !this.isLong && this.lastTradedDay !== day) {
+			if(slow < fast && fast < priceAction.vw && !this.isLong && this.lastTradedDay !== day) {
 				// BUY
 				this.isLong = true;
 				this.buyNow = true;
 			}
 
-			if (slow > fast) {
+			if (slow > fast && fast > priceAction.vw) {
 				// SELL
 				this.isLong = false;
 			}
@@ -172,7 +172,7 @@ export class MovingAverage extends Strategy {
 		}
 
 
-		if (!this.isInvested && this.buyNow && investedAllowedByTime) {
+		if (!this.isInvested && this.buyNow && investedAllowedByTime && this.lastTradedDay !== day) {
 			this.marker.push({
 				time: priceActionTime,
 				color: '#00FF00',
@@ -181,7 +181,7 @@ export class MovingAverage extends Strategy {
 				position: 'belowBar'
 			})
 
-			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash*0.5))) {
+			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash * 0.5))) {
 				// buy failed
 			}
 
@@ -240,25 +240,25 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 24 * 10) + 1;
-		this.s = this.f + Math.round(Math.random() * 24 * 20) + 1;
+		this.f = Math.round(Math.random() * 100) + 1;
+		this.s = this.f + Math.round(Math.random() * 200) + 1;
 
 		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		this.startH = 10 + Math.round(Math.random()* 10)
 		this.startM = Math.round(Math.random()* 55)
 		this.stopProfit = Math.random() * 0.1;
-		this.stopLoss = Math.random() * 0.05;
-		this.minPriceVolume = Math.random() * 100_000_000_000;
+		this.stopLoss = Math.random() * 0.1;
+		this.minPriceVolume = Math.random() * 100_000_000;
 
 		// fix
-		//this.f = 1;
-		//this.s = 45;
+		//this.f = 55;
+		//this.s = 165;
 
-		//this.stopLoss = 0.011;
-		//this.stopProfit = 0.004;
+		//this.stopLoss = 0.042;
+		//this.stopProfit = 0.006;
 
-		//this.startH = 14;
-		//this.startM = 30;
+		//this.startH = 16;
+		//this.startM = 2;
 	}
 }

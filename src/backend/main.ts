@@ -2,10 +2,7 @@ import {Runner} from "./runner";
 import {ChartSeries} from "../shared/interfaces"
 import {Market} from "./market";
 import {EventSystem} from "../shared/event-system";
-import {data} from "@tensorflow/tfjs";
-import * as Buffer from "node:buffer";
 import {inject} from "../shared/injector";
-import {Time} from "lightweight-charts";
 
 
 const SYMBOL = 'QQQ'
