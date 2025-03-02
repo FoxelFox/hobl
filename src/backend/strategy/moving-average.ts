@@ -181,7 +181,7 @@ export class MovingAverage extends Strategy {
 				position: 'belowBar'
 			})
 
-			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash * 0.5))) {
+			if (!this.broker.buy(index, this.symbol, Math.min(this.broker.cash, this.broker.cash * 0.25))) {
 				// buy failed
 			}
 
@@ -240,14 +240,14 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 100) + 1;
-		this.s = this.f + Math.round(Math.random() * 200) + 1;
+		this.f = Math.round(Math.random() * 1000) + 1;
+		this.s = this.f + Math.round(Math.random() * 2000) + 1;
 
 		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		this.startH = 10 + Math.round(Math.random()* 10)
 		this.startM = Math.round(Math.random()* 55)
-		this.stopProfit = Math.random() * 0.1;
+		this.stopProfit = Math.random() * 1;
 		this.stopLoss = Math.random() * 0.1;
 		this.minPriceVolume = Math.random() * 100_000_000;
 

@@ -28,8 +28,8 @@ export class Runner {
 		let hasImproved = false;
 		let epoch = 0;
 
-		const samples = 10;
-		const minTX = 1000;
+		const samples = 5;
+		const minTX = 100;
 		const minAvgRating = 500000;
 		const minGain = 0;
 		const maxEpoch = 25;
@@ -123,10 +123,10 @@ export class Runner {
 			symbol: this.symbol,
 			//rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
 			//rating: (this.broker.cash - this.broker.startCash),
-			//rating: this.broker.winRate * this.broker.cash,
+			rating: this.broker.winRate * this.broker.cash,
 			//rating: this.broker.winRate,
 			//rating: this.broker.winRate * this.broker.cash / this.broker.transactions,
-			rating: (this.broker.winRate / this.broker.transactions) * this.broker.cash,
+			//rating: (this.broker.winRate / this.broker.transactions) * this.broker.cash,
 			cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
 			tx: this.broker.transactions,
 			fast: this.strategy.f,

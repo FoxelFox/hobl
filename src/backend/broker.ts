@@ -4,7 +4,7 @@ import {Time} from "lightweight-charts";
 
 export class Broker {
 
-	readonly startCash = 1000;
+	readonly startCash = 10000;
 
 	cash: number = this.startCash;
 	positions: { [symbol: string]: number } = {};
@@ -15,7 +15,7 @@ export class Broker {
 	lastCashUsed: number;
 	win: number = 0;
 	loose: number = 0;
-	delay: number = 15; // delayed data
+	delay: number = 1; // delayed data
 
 	constructor(private market: Market) {
 

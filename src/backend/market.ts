@@ -10,7 +10,7 @@ export interface Listing {
 
 export class Market {
 
-	timeFrame = TimeFrame.M1;
+	timeFrame = TimeFrame.M15;
 	api: AlpacaApi = new AlpacaApi();
 	listings: { [symbol: string]: Listing } = {};
 	eventSystem = inject(EventSystem);
