@@ -2,6 +2,7 @@ import {AlpacaApi, TimeFrame} from "./alpacaApi";
 import {EventSystem} from "../shared/event-system";
 import { inject } from "../shared/injector";
 import {Asset, RawPriceAction, RawWebsocketPriceAction} from "./interfaces";
+import {config} from "../config";
 
 export interface Listing {
 	asset: Asset
@@ -10,7 +11,7 @@ export interface Listing {
 
 export class Market {
 
-	timeFrame = TimeFrame.M15;
+	timeFrame: TimeFrame  = config.timeFrame;
 	api: AlpacaApi = new AlpacaApi();
 	listings: { [symbol: string]: Listing } = {};
 	eventSystem = inject(EventSystem);

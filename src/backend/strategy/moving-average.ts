@@ -1,6 +1,6 @@
 import {Strategy} from "./strategy";
 import {Broker} from "../broker";
-import {Candle, CandleSeries, ChartSeries, TimeValue} from "../../shared/interfaces";
+import {Candle, ChartSeries, TimeValue} from "../../shared/interfaces";
 import {SeriesMarker, Time} from "lightweight-charts";
 import {EventSystem} from "../../shared/event-system";
 import {inject} from "../../shared/injector";

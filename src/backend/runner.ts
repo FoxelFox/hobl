@@ -4,6 +4,7 @@ import {MovingAverage} from "./strategy/moving-average";
 import {sum} from "@tensorflow/tfjs";
 import {EventSystem} from "../shared/event-system";
 import {inject} from "../shared/injector";
+import {config} from "../config";
 
 export class Runner {
 	broker: Broker
@@ -28,16 +29,12 @@ export class Runner {
 		let hasImproved = false;
 		let epoch = 0;
 
-		const samples = 5;
-		const minTX = 100;
-		const minAvgRating = 500000;
-		const minGain = 0;
-		const maxEpoch = 25;
+
 		const skipTraining = false;
 		const trainPriceActions = listing.priceActions.slice(0, listing.priceActions.length - 0);
 
 		do {
-			for (let i = 0; i < samples; ++i) {
+			for (let i = 0; i < config.samples; ++i) {
 				let index = 0;
 				this.strategy.tune();
 
@@ -47,7 +44,7 @@ export class Runner {
 				}
 
 				this.strategy.finish(index -1);
-				if (this.broker.transactions >= minTX) {
+				if (this.broker.transactions >= config.minTX) {
 				// 	if (this.broker.cash > this.broker.startCash * minGain) {
 						results.push(this.generateResultReport());
 					// }
@@ -57,7 +54,7 @@ export class Runner {
 			}
 
 			results.sort((a, b) => (b.rating - a.rating))
-			results.length = Math.min(samples, results.length);
+			results.length = Math.min(config.samples, results.length);
 
 
 			if (results.length > 0) {
@@ -76,8 +73,8 @@ export class Runner {
 			console.clear();
 			this.logTable(results, epoch);
 
-			console.log(hasImproved, max < minAvgRating,results.length === 0,isNaN(max))
-		}while (!skipTraining && epoch < maxEpoch && (hasImproved || max < minAvgRating || results.length === 0 || isNaN(max)));
+			console.log(hasImproved,results.length === 0,isNaN(max))
+		}while (!skipTraining && epoch < config.maxEpoch && (hasImproved || results.length === 0 || isNaN(max)));
 
 		console.log("Done", max)
 
