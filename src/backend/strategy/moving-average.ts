@@ -240,8 +240,8 @@ export class MovingAverage extends Strategy {
 	}
 
 	tune() {
-		this.f = Math.round(Math.random() * 1000) + 1;
-		this.s = this.f + Math.round(Math.random() * 2000) + 1;
+		this.f = Math.round(Math.random() * 100) + 1;
+		this.s = this.f + Math.round(Math.random() * 200) + 1;
 
 		//this.f = 4763 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
 		//this.s = 5495 + Math.round(Math.random() * 2 - 1) * 50; // +- 10
@@ -252,13 +252,13 @@ export class MovingAverage extends Strategy {
 		this.minPriceVolume = Math.random() * 100_000_000;
 
 		// fix
-		//this.f = 55;
-		//this.s = 165;
+		this.s = 209;
+		this.f = 66;
 
-		//this.stopLoss = 0.042;
-		//this.stopProfit = 0.006;
+		this.stopLoss = 0.088;
+		this.stopProfit = 0.022;
 
-		//this.startH = 16;
-		//this.startM = 2;
+		this.startH = 10;
+		this.startM = 7;
 	}
 }
