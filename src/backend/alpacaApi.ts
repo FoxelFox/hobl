@@ -129,7 +129,7 @@ export class AlpacaApi {
 
 	private async loadFromStorage(symbol: string, timeframe: TimeFrame): Promise<RawPriceAction[]> {
 		try {
-			return await Bun.file(`./data/${symbol}/${timeframe}.json`).json();
+			return await Bun.file(`./data/${symbol}/${timeframe}.json`).json() as RawPriceAction[];
 		} catch (e) {
 			return [];
 		}

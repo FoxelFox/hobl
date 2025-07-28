@@ -1,7 +1,6 @@
 import {Market} from "./market";
 import {Broker} from "./broker";
 import {MovingAverage} from "./strategy/moving-average";
-import {sum} from "@tensorflow/tfjs";
 import {EventSystem} from "../shared/event-system";
 import {inject} from "../shared/injector";
 import {config} from "../config";
