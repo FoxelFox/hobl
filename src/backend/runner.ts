@@ -79,13 +79,8 @@ export class Runner {
 
 		// restart the best setup
 		console.log(this.strategy.marker.length)
-		this.strategy.s = results[0].slow;
-		this.strategy.f = results[0].fast;
-		this.strategy.stopLoss = results[0].stopLoss;
-		this.strategy.stopProfit = results[0].stopProfit;
-		this.strategy.minPriceVolume = results[0].volume;
-		this.strategy.startH = results[0].SH;
-		this.strategy.startM = results[0].SM;
+
+		this.strategy.load(results[0]);
 
 		let index = 0;
 		for (const priceAction of listing.priceActions) {
@@ -94,28 +89,26 @@ export class Runner {
 		}
 	}
 
-	logTable(results, epoch?: number) {
-		const formatedResult = results.map(e => ({
-			symbol: e.symbol,
-			rating: e.rating.toFixed(2),
-			cash: e.cash,
-			tx: e.tx.toString(),
-			fast: e.fast.toString(),
-			slow: e.slow.toString(),
-			stopProfit: e.stopProfit.toFixed(3),
-			stopLoss: e.stopLoss.toFixed(3),
-			volume: e.volume,
-			SH: e.SH,
-			SM: e.SM,
-			win: Math.round(e.win * 100)
-		}));
+	logTable(results: Record<string, any>[], epoch?: number) {
+		const logs = [];
+
+		for (const result of results) {
+			const log = this.strategy.log(result);
+			log.symbol = result.symbol;
+			log.rating = result.rating.toFixed(2);
+			log.cash = result.cash;
+			log.tx = result.tx.toString();
+			log.win = Math.round(result.win * 100);
+			logs.push(log);
+		}
 
 		epoch ? console.log(`epoch ${epoch}`): 42
-		console.table(formatedResult);
+		console.table(logs);
 	}
 
 	generateResultReport() {
-		return {
+
+		const record = {
 			symbol: this.symbol,
 			//rating: (this.broker.cash - this.broker.startCash) / (this.broker.transactions / 2),
 			//rating: (this.broker.cash - this.broker.startCash),
@@ -125,14 +118,10 @@ export class Runner {
 			//rating: (this.broker.winRate / this.broker.transactions) * this.broker.cash,
 			cash: `${this.broker.cash.toLocaleString('de', {maximumFractionDigits: 2})}`,
 			tx: this.broker.transactions,
-			fast: this.strategy.f,
-			slow: this.strategy.s,
-			stopProfit: this.strategy.stopProfit,
-			stopLoss: this.strategy.stopLoss,
-			volume: this.strategy.minPriceVolume,
-			SM: this.strategy.startM,
-			SH: this.strategy.startH,
 			win: this.broker.winRate
-		}
+		};
+
+		this.strategy.save(record);
+		return record;
 	}
 }

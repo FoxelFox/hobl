@@ -3,13 +3,8 @@ import {RawPriceAction} from "../interfaces";
 
 export abstract class Strategy {
 
-	constructor(protected broker: Broker) {
-
+	protected constructor(protected broker: Broker) {
 	}
-
-	abstract tick(index: number, priceAction: RawPriceAction)
-
-	abstract tune()
 
 	finish(index: number) {
 		this.broker.sellAllPositions(index);
@@ -18,4 +13,14 @@ export abstract class Strategy {
 	reset() {
 		this.broker.reset();
 	}
+
+	abstract tick(index: number, priceAction: RawPriceAction): void
+
+	abstract tune(): void
+
+	abstract save(config: Record<string, any>): void
+
+	abstract load(config: Record<string, any>): void
+
+	abstract log(config: Record<string, any>): void
 }

@@ -9,7 +9,6 @@ import {RawPriceAction} from "../interfaces";
 
 export class MovingAverage extends Strategy {
 
-
 	fast: TimeValue[] = [];
 	slow: TimeValue[] = [];
 	stopLossLine: TimeValue[] = [];
@@ -96,6 +95,40 @@ export class MovingAverage extends Strategy {
 
 			this.eventSystem.publish('chart-update', chart)
 		});
+	}
+
+	save(config: Record<string, any>): void {
+		config.f = this.f;
+		config.s = this.s;
+		config.stopProfit = this.stopProfit;
+		config.stopLoss = this.stopLoss;
+		config.minPriceVolume = this.minPriceVolume;
+		config.startM = this.startM;
+		config.startH = this.startH;
+	}
+
+	load(config: Record<string, any>): void {
+		this.f = config.f;
+		this.s = config.s;
+		this.stopProfit = config.stopProfit;
+		this.stopLoss = config.stopLoss;
+		this.minPriceVolume = config.minPriceVolume;
+		this.startM = config.startM;
+		this.startH = config.startM;
+	}
+
+	log(config: Record<string, any>): Record<string, any> {
+		const log: Record<string, any> = {};
+
+		log.f = config.f.toString();
+		log.s = config.s.toString();
+		log.stopProfit = config.stopProfit.toFixed(3);
+		log.stopLoss = config.stopLoss.toFixed(3);
+		log.volume = config.volume
+		log.startH = config.startH
+		log.startM = config.startM
+
+		return log;
 	}
 
 	tick(index: number, priceAction: RawPriceAction) {
